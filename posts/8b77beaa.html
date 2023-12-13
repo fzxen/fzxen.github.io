@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>HTTP首部 | Hexo</title>
+  <meta name="description" content="http首部分为四部分——请求行&#x2F;状态行、请求&#x2F;响应首部字段、通用首部字段、实体首部字段组成。 梳理一下当作字典，以便日后查阅。 首部一览HTTP&#x2F;1.1 规范定义了如下 47 种首部字段。    首部字段名 说明    Cache-Control （强）缓存控制，1.0还有个Expired   Connection    通用首部字段通用首部字段是指，请求报文和响应">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP首部">
+<meta property="og:url" content="https://zxffan.github.io/posts/8b77beaa.html">
+<meta property="og:site_name" content="zxfan">
+<meta property="og:description" content="http首部分为四部分——请求行&#x2F;状态行、请求&#x2F;响应首部字段、通用首部字段、实体首部字段组成。 梳理一下当作字典，以便日后查阅。 首部一览HTTP&#x2F;1.1 规范定义了如下 47 种首部字段。    首部字段名 说明    Cache-Control （强）缓存控制，1.0还有个Expired   Connection    通用首部字段通用首部字段是指，请求报文和响应">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zxffan.github.io/images/%E5%9B%BE%E8%A7%A3HTTP/via_header.png">
+<meta property="article:published_time" content="2020-11-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-30T11:14:18.594Z">
+<meta property="article:author" content="zxfan">
+<meta property="article:tag" content="NetWork">
+<meta property="article:tag" content="HTTP Header">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zxffan.github.io/images/%E5%9B%BE%E8%A7%A3HTTP/via_header.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://zxffan.github.io/posts/8b77beaa.html">
+  
+    <link rel="alternate" href="/atom.xml" title="zxfan" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/fzxen" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpeg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">fzxen</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Web Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Beijing, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/fzxen" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/zxffan" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS/">CSS</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Electron/">Electron</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/">JavaScript</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Media/">Media</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/NetWork/">NetWork</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rust/">Rust</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Server/">Server</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/experience/">experience</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/self/">self</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E7%A8%8B%E5%8C%96/">工程化</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AF%BB%E4%B9%A6/">读书</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithm/" rel="tag">Algorithm</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/" rel="tag">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Electron/" rel="tag">Electron</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/FrontEnd/" rel="tag">FrontEnd</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/" rel="tag">HTTP</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP-Header/" rel="tag">HTTP Header</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NetWork/" rel="tag">NetWork</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/" rel="tag">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nodejs/" rel="tag">Nodejs</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Number/" rel="tag">Number</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Promise/" rel="tag">Promise</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rust/" rel="tag">Rust</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Server/" rel="tag">Server</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Serverless/" rel="tag">Serverless</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP-IP/" rel="tag">TCP&#x2F;IP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript/" rel="tag">TypeScript</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/" rel="tag">WebRTC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/animation/" rel="tag">animation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/audio/" rel="tag">audio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/browser/" rel="tag">browser</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clean-architecture/" rel="tag">clean architecture</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crypto/" rel="tag">crypto</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/functional-programing/" rel="tag">functional programing</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/interview/" rel="tag">interview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/" rel="tag">javascript</a><span class="tag-list-count">24</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs/" rel="tag">nodejs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regExp/" rel="tag">regExp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssr/" rel="tag">ssr</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/" rel="tag">video</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-vitals/" rel="tag">web-vitals</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/" rel="tag">webpack</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%91%E8%AE%A1%E7%AE%97/" rel="tag">云计算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" rel="tag">位运算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1/" rel="tag">服务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF/" rel="tag">桌面端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF%E8%BD%AF%E4%BB%B6/" rel="tag">桌面端软件</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" rel="tag">语言学习</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Algorithm/" style="font-size: 13.63px;">Algorithm</a> <a href="/tags/C/" style="font-size: 13px;">C++</a> <a href="/tags/Electron/" style="font-size: 13.75px;">Electron</a> <a href="/tags/FrontEnd/" style="font-size: 13px;">FrontEnd</a> <a href="/tags/HTTP/" style="font-size: 13.25px;">HTTP</a> <a href="/tags/HTTP-Header/" style="font-size: 13px;">HTTP Header</a> <a href="/tags/JavaScript/" style="font-size: 13.88px;">JavaScript</a> <a href="/tags/NetWork/" style="font-size: 13.38px;">NetWork</a> <a href="/tags/Nginx/" style="font-size: 13px;">Nginx</a> <a href="/tags/Nodejs/" style="font-size: 13.5px;">Nodejs</a> <a href="/tags/Number/" style="font-size: 13px;">Number</a> <a href="/tags/Promise/" style="font-size: 13.13px;">Promise</a> <a href="/tags/Rust/" style="font-size: 13.38px;">Rust</a> <a href="/tags/Server/" style="font-size: 13px;">Server</a> <a href="/tags/Serverless/" style="font-size: 13px;">Serverless</a> <a href="/tags/TCP-IP/" style="font-size: 13px;">TCP/IP</a> <a href="/tags/TypeScript/" style="font-size: 13.63px;">TypeScript</a> <a href="/tags/Web/" style="font-size: 13px;">Web</a> <a href="/tags/WebRTC/" style="font-size: 13.13px;">WebRTC</a> <a href="/tags/animation/" style="font-size: 13px;">animation</a> <a href="/tags/audio/" style="font-size: 13px;">audio</a> <a href="/tags/browser/" style="font-size: 13px;">browser</a> <a href="/tags/clean-architecture/" style="font-size: 13px;">clean architecture</a> <a href="/tags/crypto/" style="font-size: 13px;">crypto</a> <a href="/tags/css/" style="font-size: 13.13px;">css</a> <a href="/tags/functional-programing/" style="font-size: 13px;">functional programing</a> <a href="/tags/interview/" style="font-size: 13px;">interview</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/nodejs/" style="font-size: 13px;">nodejs</a> <a href="/tags/regExp/" style="font-size: 13px;">regExp</a> <a href="/tags/ssr/" style="font-size: 13px;">ssr</a> <a href="/tags/video/" style="font-size: 13px;">video</a> <a href="/tags/vue/" style="font-size: 13.75px;">vue</a> <a href="/tags/vue2/" style="font-size: 13px;">vue2</a> <a href="/tags/web-vitals/" style="font-size: 13px;">web-vitals</a> <a href="/tags/webpack/" style="font-size: 13.63px;">webpack</a> <a href="/tags/%E4%BA%91%E8%AE%A1%E7%AE%97/" style="font-size: 13px;">云计算</a> <a href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size: 13px;">位运算</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 13px;">前端</a> <a href="/tags/%E5%AE%89%E5%85%A8/" style="font-size: 13px;">安全</a> <a href="/tags/%E6%9C%8D%E5%8A%A1/" style="font-size: 13px;">服务</a> <a href="/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 13.63px;">架构</a> <a href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF/" style="font-size: 13px;">桌面端</a> <a href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF%E8%BD%AF%E4%BB%B6/" style="font-size: 13.63px;">桌面端软件</a> <a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 13.38px;">网络</a> <a href="/tags/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" style="font-size: 13.25px;">语言学习</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">七月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">九月 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AF%BB%E4%B9%A6/">读书</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/a8730dfb.html" class="title">架构整洁之道</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-10-29T16:00:00.000Z" itemprop="datePublished">2021-10-30</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/experience/">experience</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/673cef84.html" class="title">认识ProtocolBuffers</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-07-15T16:00:00.000Z" itemprop="datePublished">2021-07-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/experience/">experience</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/6f842db3.html" class="title">Crypto</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-06-19T16:00:00.000Z" itemprop="datePublished">2021-06-20</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/self/">self</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/33f3fd9d.html" class="title">字节跳动面试</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-06-04T16:00:00.000Z" itemprop="datePublished">2021-06-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/CSS/">CSS</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/d8bddba6.html" class="title">clear 清除浮动</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-05-30T16:00:00.000Z" itemprop="datePublished">2021-05-31</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A6%96%E9%83%A8%E4%B8%80%E8%A7%88"><span class="toc-number">1.</span> <span class="toc-text">首部一览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9A%E7%94%A8%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">2.</span> <span class="toc-text">通用首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Cache-Control"><span class="toc-number">2.1.</span> <span class="toc-text">Cache-Control</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%B7%E6%B1%82%E5%A4%B4%E5%8F%82%E6%95%B0"><span class="toc-number">2.1.1.</span> <span class="toc-text">请求头参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%93%8D%E5%BA%94%E5%A4%B4%E5%8F%82%E6%95%B0"><span class="toc-number">2.1.2.</span> <span class="toc-text">响应头参数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Connection"><span class="toc-number">2.2.</span> <span class="toc-text">Connection</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%A7%E5%88%B6%E4%B8%8D%E5%86%8D%E8%BD%AC%E5%8F%91%E7%BB%99%E4%BB%A3%E7%90%86%E7%9A%84%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">2.2.1.</span> <span class="toc-text">控制不再转发给代理的首部字段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96%E8%BF%9E%E6%8E%A5"><span class="toc-number">2.2.2.</span> <span class="toc-text">持久化连接</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Date"><span class="toc-number">2.3.</span> <span class="toc-text">Date</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Pragma"><span class="toc-number">2.4.</span> <span class="toc-text">Pragma</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Trailer"><span class="toc-number">2.5.</span> <span class="toc-text">Trailer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Transfer-Encoding"><span class="toc-number">2.6.</span> <span class="toc-text">Transfer-Encoding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Upgrade"><span class="toc-number">2.7.</span> <span class="toc-text">Upgrade</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Via"><span class="toc-number">2.8.</span> <span class="toc-text">Via</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Warning"><span class="toc-number">2.9.</span> <span class="toc-text">Warning</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%B7%E6%B1%82%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">3.</span> <span class="toc-text">请求首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept"><span class="toc-number">3.1.</span> <span class="toc-text">Accept</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept-Charset"><span class="toc-number">3.2.</span> <span class="toc-text">Accept-Charset</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept-Encoding"><span class="toc-number">3.3.</span> <span class="toc-text">Accept-Encoding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept-Language"><span class="toc-number">3.4.</span> <span class="toc-text">Accept-Language</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Authorization"><span class="toc-number">3.5.</span> <span class="toc-text">Authorization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Expect"><span class="toc-number">3.6.</span> <span class="toc-text">Expect</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#From"><span class="toc-number">3.7.</span> <span class="toc-text">From</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Host%EF%BC%88%E9%87%8D%E8%A6%81%E6%A6%82%E5%BF%B5%EF%BC%89"><span class="toc-number">3.8.</span> <span class="toc-text">Host（重要概念）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#If-Match"><span class="toc-number">3.9.</span> <span class="toc-text">If-Match</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#If-Modified-Since"><span class="toc-number">3.10.</span> <span class="toc-text">If-Modified-Since</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#If-None-Match"><span class="toc-number">3.11.</span> <span class="toc-text">If-None-Match</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%93%8D%E5%BA%94%E9%A6%96%E9%83%A8%E5%AD%97%E6%AE%B5"><span class="toc-number">4.</span> <span class="toc-text">响应首部字段</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Accept-Ranges"><span class="toc-number">4.1.</span> <span class="toc-text">Accept-Ranges</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Age"><span class="toc-number">4.2.</span> <span class="toc-text">Age</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ETag"><span class="toc-number">4.3.</span> <span class="toc-text">ETag</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Location"><span class="toc-number">4.4.</span> <span class="toc-text">Location</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Proxy-Authenticate"><span class="toc-number">4.5.</span> <span class="toc-text">Proxy-Authenticate</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Retry-After"><span class="toc-number">4.6.</span> <span class="toc-text">Retry-After</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Server"><span class="toc-number">4.7.</span> <span class="toc-text">Server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Vary"><span class="toc-number">4.8.</span> <span class="toc-text">Vary</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Network/HTTP首部" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      HTTP首部
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/posts/8b77beaa.html" class="article-date">
+	  <time datetime="2020-11-10T16:00:00.000Z" itemprop="datePublished">2020-11-11</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/NetWork/">NetWork</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/HTTP-Header/" rel="tag">HTTP Header</a>, <a class="article-tag-link-link" href="/tags/NetWork/" rel="tag">NetWork</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/posts/8b77beaa.html#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>http首部分为四部分——<strong>请求行&#x2F;状态行</strong>、<strong>请求&#x2F;响应首部字段</strong>、<strong>通用首部字段</strong>、<strong>实体首部字段</strong>组成。</p>
+<p>梳理一下当作字典，以便日后查阅。</p>
+<h2 id="首部一览"><a href="#首部一览" class="headerlink" title="首部一览"></a>首部一览</h2><p>HTTP&#x2F;1.1 规范定义了如下 47 种首部字段。</p>
+<table>
+<thead>
+<tr>
+<th>首部字段名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Cache-Control</code></td>
+<td>（强）缓存控制，1.0还有个<code>Expired</code></td>
+</tr>
+<tr>
+<td><code>Connection</code></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="通用首部字段"><a href="#通用首部字段" class="headerlink" title="通用首部字段"></a>通用首部字段</h2><p>通用首部字段是指，请求报文和响应报文双方都会使用的首部。</p>
+<h3 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h3><p>场景：浏览器第一次请求服务器时，服务端返回资源并再<strong>response header</strong>加上<code>Cache-Control: max-age=56700000</code>。浏览器接受资源并把资源和相关头信息缓存下来。当第二次请求改资源时，先从缓存中找，计算第一次请求的时间和<code>max-age</code>来判断是否过期。若没过期则取缓存内容，若过期再向服务器请求。</p>
+<p>这个字段既可以出现在请求头中也可以出现在响应头中，但参数不太一样</p>
+<h4 id="请求头参数"><a href="#请求头参数" class="headerlink" title="请求头参数"></a>请求头参数</h4><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>no-cache</code></td>
+<td>无</td>
+<td>不使用强缓存，强制向源服务器再次验证（使用协商缓存）</td>
+</tr>
+<tr>
+<td><code>no-store</code></td>
+<td>无</td>
+<td>不使用缓存</td>
+</tr>
+<tr>
+<td><code>max-age=[ 秒]</code></td>
+<td>秒</td>
+<td>缓存的时间</td>
+</tr>
+<tr>
+<td><code>max-stale=[ 秒]</code></td>
+<td>秒</td>
+<td>可省略，可容忍的最大过期时间, 接受age+stale时间内的缓存数据</td>
+</tr>
+<tr>
+<td><code>min-fresh=[ 秒]</code></td>
+<td>秒</td>
+<td><code>min-fresh=60</code>要求（缓存）服务器返回缓存时间未过60s的资源</td>
+</tr>
+<tr>
+<td><code>no-transform</code></td>
+<td>无</td>
+<td>缓存不能改变实体主体的媒体类型</td>
+</tr>
+<tr>
+<td><code>only-if-cached</code></td>
+<td>无</td>
+<td>完全使用缓存，若未命中返回<code>504 Gateway Timeout</code></td>
+</tr>
+<tr>
+<td><code>cache-extension</code></td>
+<td>无</td>
+<td>新指令标记（token）</td>
+</tr>
+</tbody></table>
+<p><code>cache-extension</code> token可以扩展<code>Cache-Control</code>首部字段内的指令<br>例如：<code>Cache-Control: private, community=&quot;UCI&quot;</code><br>其中<code>community</code>属于扩展指令</p>
+<h4 id="响应头参数"><a href="#响应头参数" class="headerlink" title="响应头参数"></a>响应头参数</h4><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>public</code></td>
+<td>无</td>
+<td>可以被任意方缓存</td>
+</tr>
+<tr>
+<td><code>private</code></td>
+<td>无</td>
+<td>仅可被特定用户缓存</td>
+</tr>
+<tr>
+<td><code>no-cache</code></td>
+<td>无</td>
+<td>可省略，使用缓存前先向服务端验证有效性（协商）</td>
+</tr>
+<tr>
+<td><code>no-store</code></td>
+<td>无</td>
+<td>不缓存请求和响应内容</td>
+</tr>
+<tr>
+<td><code>no-transform</code></td>
+<td>无</td>
+<td>缓存不能改变实体主体的媒体类型</td>
+</tr>
+<tr>
+<td><code>must-revalidate</code></td>
+<td>无</td>
+<td>可缓存但必须再向源服务器进行确认</td>
+</tr>
+<tr>
+<td><code>proxy-revalidate</code></td>
+<td>无</td>
+<td>要求中间缓存服务器对缓存的响应有效性再进行确认</td>
+</tr>
+<tr>
+<td><code>max-age=[ 秒]</code></td>
+<td>秒</td>
+<td>缓存的时间</td>
+</tr>
+<tr>
+<td><code>s-maxage=[ 秒]</code></td>
+<td>秒</td>
+<td><strong>公共缓存服务器</strong>响应的最大Age值</td>
+</tr>
+<tr>
+<td><code>cache-extension</code></td>
+<td>无</td>
+<td>新指令标记（token）</td>
+</tr>
+</tbody></table>
+<h3 id="Connection"><a href="#Connection" class="headerlink" title="Connection"></a>Connection</h3><p><code>Connection</code>首部字段有两个作用</p>
+<ol>
+<li>控制不再转发给代理的首部字段</li>
+<li>管理持久化连接</li>
+</ol>
+<h4 id="控制不再转发给代理的首部字段"><a href="#控制不再转发给代理的首部字段" class="headerlink" title="控制不再转发给代理的首部字段"></a>控制不再转发给代理的首部字段</h4><p>使用方式：再请求头加上<code>Connection: 不再转发的首部字段名</code><br>当请求发送给代理服务器时，代理服务器会剔除指定首部字段，然后再转发给源服务器</p>
+<h4 id="持久化连接"><a href="#持久化连接" class="headerlink" title="持久化连接"></a>持久化连接</h4><p><code>HTTP/1.1</code>默认全部都是持久化连接，当服务端想断开连接时，在响应头中指定字段<code>Connection: close</code></p>
+<p><code>HTTP/1.0</code>默认是非持久化连接。若想建立持久化连接，请求双方都要在头信息中加上<code>Connection: Keep-Alive</code></p>
+<h3 id="Date"><a href="#Date" class="headerlink" title="Date"></a>Date</h3><p><code>Date</code>表示创建HTTP报文的日期和时间，格式如：<code>Date: Tue, 03 Jul 2012 04:40:59 GMT</code></p>
+<h3 id="Pragma"><a href="#Pragma" class="headerlink" title="Pragma"></a>Pragma</h3><p><code>Pragma: no-cache</code>与<code>Cache-Control: no-cache</code>作用相同。是为了兼容<code>HTTP/1.0</code>而存在的</p>
+<h3 id="Trailer"><a href="#Trailer" class="headerlink" title="Trailer"></a>Trailer</h3><p>响应首部。<code>Trailer</code>字段指明在报文主体后记录了哪些首部字段，允许发送方在分块发送的消息后面添加额外的元信息<br>使用：<code>Trailer: Expires</code></p>
+<h3 id="Transfer-Encoding"><a href="#Transfer-Encoding" class="headerlink" title="Transfer-Encoding"></a>Transfer-Encoding</h3><p>指定报文主体的传输编码，HTTP&#x2F;1.1 的传输编码方式仅对分块传输编码有效。<br>使用：<code>Transfer-Encoding: chunk</code></p>
+<h3 id="Upgrade"><a href="#Upgrade" class="headerlink" title="Upgrade"></a>Upgrade</h3><p>用于检测能否升级通信协议，其参数值可以用来指定一个完全不同的通信协议。<br>使用：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Upgrade: TLS/1.0, HTTP/1.1</span><br><span class="line">Connection: Upgrade</span><br></pre></td></tr></table></figure>
+
+<p>通常配合<code>Connection</code>使用，因为<code>Upgrade</code>字段不需要转发</p>
+<h3 id="Via"><a href="#Via" class="headerlink" title="Via"></a>Via</h3><p>用于追踪客户端和服务端之间的请求和响应报文的传输路径</p>
+<p><img src="/../../images/%E5%9B%BE%E8%A7%A3HTTP/via_header.png" alt="via_header"></p>
+<h3 id="Warning"><a href="#Warning" class="headerlink" title="Warning"></a>Warning</h3><p>返回与缓存相关的警告，<br>例如：<code>Warning: 113 gw.hackr.jp:8080 &quot;Heuristic expiration&quot; Tue, 03</code><br>格式：<code>Warning: [警告码][警告的主机:端口号]“[警告内容]”([日期时间])</code></p>
+<h2 id="请求首部字段"><a href="#请求首部字段" class="headerlink" title="请求首部字段"></a>请求首部字段</h2><p>请求首部字段是从客户端往服务器端发送请求报文中所使用的字段，用于补充请求的附加信息、客户端信息、对响应内容相关的优先级等内容。</p>
+<h3 id="Accept"><a href="#Accept" class="headerlink" title="Accept"></a>Accept</h3><p>告知服务器，客户端所期望的媒体类型或媒体类型优先顺序，用q表示权重（取0~1，默认1）<br>使用：<code>Accept: text/html,application/xhtml+xml,application/xml;q=0.9</code></p>
+<p>常见媒体类型:</p>
+<ol>
+<li>文本文件<ul>
+<li><code>text/html</code>、<code>text/plain</code>、<code>text/css</code></li>
+<li><code>application/xhtml+xml</code>、<code>application/xml</code></li>
+</ul>
+</li>
+<li>图片文件<ul>
+<li><code>image/jpeg</code>、<code>image/gif</code>、<code>image/png</code></li>
+</ul>
+</li>
+<li>视频文件<ul>
+<li><code>video/mpeg</code>、<code>video/quicktime</code></li>
+</ul>
+</li>
+<li>应用程序使用的二进制文件<ul>
+<li><code>application/octet-stream</code>、<code>application/zip</code></li>
+</ul>
+</li>
+</ol>
+<h3 id="Accept-Charset"><a href="#Accept-Charset" class="headerlink" title="Accept-Charset"></a>Accept-Charset</h3><p>告知服务器，客户端所期望的字符集或字符集的优先顺序，也可以用q来表示权重<br>使用：<code>Accept-Charset: iso-8859-5, unicode-1-1;q=0.8</code></p>
+<h3 id="Accept-Encoding"><a href="#Accept-Encoding" class="headerlink" title="Accept-Encoding"></a>Accept-Encoding</h3><p>告知服务器，客户端所期望的内容编码或内容编码优先级顺序<br>使用: <code>Accept-Encoding: gzip, deflate</code></p>
+<p>常见编码方式：</p>
+<ul>
+<li>gzip<br>由文件压缩程序 gzip（GNU zip）生成的编码格式（RFC1952），采用 Lempel-Ziv 算法（LZ77）及 32 位循环冗余校验（Cyclic Redundancy Check，通称 CRC）。</li>
+<li>compress<br>由 UNIX 文件压缩程序 compress 生成的编码格式，采用 Lempel-Ziv-Welch 算法（LZW）。</li>
+<li>deflate<br>组合使用 zlib 格式（RFC1950）及由 deflate 压缩算法（RFC1951）生成的编码格式。</li>
+<li>identity<br>不执行压缩或不会变化的默认编码格式</li>
+</ul>
+<p>采用权重 q 值来表示相对优先级，这点与首部字段 Accept 相同。另外，也可使用星号（*）作为通配符，指定任意的编码格式。</p>
+<h3 id="Accept-Language"><a href="#Accept-Language" class="headerlink" title="Accept-Language"></a>Accept-Language</h3><p>告知服务器客户端所期望的自然语言集（指中文或英文等），以及自然语言集的相对优先级。</p>
+<p>使用：<code>Accept-Language: zh-cn,zh;q=0.7,en-us,en;q=0.3</code></p>
+<h3 id="Authorization"><a href="#Authorization" class="headerlink" title="Authorization"></a>Authorization</h3><p>告知服务器客户端的认证信息。<br>当客户端未携带认证信息，服务端会返回<strong>401 Unauthorized</strong><br>使用：<code>Authorization: Basic dWVub3NlbjpwYXNzd29yZA==</code></p>
+<h3 id="Expect"><a href="#Expect" class="headerlink" title="Expect"></a>Expect</h3><p>发送一个POST请求，请求头携带<code>Expect: 100-continue</code>，会先去询问Server是否愿意接受数据<br>接收到Server返回的<code>100-continue</code>应答以后，才能把数据POST给Server</p>
+<h3 id="From"><a href="#From" class="headerlink" title="From"></a>From</h3><p>该字段用来记录用户的电子邮件地址，使用：<code>From: yourname@outlook.com</code></p>
+<h3 id="Host（重要概念）"><a href="#Host（重要概念）" class="headerlink" title="Host（重要概念）"></a>Host（重要概念）</h3><p>先明确<strong>虚拟主机的概念</strong>——一台服务器对应一个公网IP地址，一个IP又可以对应多个域名，那么如何通过不同域名访问对应服务器上不同的站点呢？答案是，将服务器划分成多个虚拟主机，在请求头上加上<code>Host</code>字段指定对应虚拟主机名称，这样就能访问到对应的站点</p>
+<blockquote>
+<p><code>nginx</code> 划分虚拟主机很简单，直接设置不同的<code>server_name</code>即可</p>
+</blockquote>
+<h3 id="If-Match"><a href="#If-Match" class="headerlink" title="If-Match"></a>If-Match</h3><p>形如<code>If-*</code>的字段称之为条件请求，只有判断指定条件为真时，才会执行请求。</p>
+<p>客户端发送请求，携带<code>If-Match: &quot;123456&quot;</code>。服务端为实体资源生成实体标记<code>ETag</code>，然后判断<code>If-Match</code>和<code>ETag</code>的值。若相同，则返回实体资源；若不同，则返回<strong>412 Precondition Failed</strong></p>
+<blockquote>
+<p>If-match的取值还可以时<code>*</code>，表示让服务端忽略<code>ETag</code></p>
+</blockquote>
+<h3 id="If-Modified-Since"><a href="#If-Modified-Since" class="headerlink" title="If-Modified-Since"></a>If-Modified-Since</h3><p>这个请求头与<strong>协商缓存</strong>有关</p>
+<ul>
+<li>客户端第一次发送请求。服务端收到请求后，返回实体资源并加上响应头<code>Last-Modified</code>其值为该资源最后一次修改时间。客户端收到响应后缓存该资源和<code>Last-Modified</code></li>
+<li>客户端第二次发送请求，在请求头上携带<code>If-Modified-Since</code>，其值为上一次服务端返回的<code>Last-Modified</code>值。当服务端收到请求后，检查对应实体资源最新的<code>Last-Modified</code>并与<code>If-Modified-Since</code>对比判断是否过期。若未过期，则返回<strong>304 Not Modified</strong>表示客户端可以使用缓存；若过期，返回新的实体资源和<code>Last-Modified</code></li>
+</ul>
+<h3 id="If-None-Match"><a href="#If-None-Match" class="headerlink" title="If-None-Match"></a>If-None-Match</h3><p>这个字段与<code>If-Match</code>作用相反</p>
+<p>待续…</p>
+<h2 id="响应首部字段"><a href="#响应首部字段" class="headerlink" title="响应首部字段"></a>响应首部字段</h2><p>响应首部字段是服务器返回给客户端的响应报文中所使用的字段</p>
+<h3 id="Accept-Ranges"><a href="#Accept-Ranges" class="headerlink" title="Accept-Ranges"></a>Accept-Ranges</h3><p>用来告知客户端能否处理范围请求</p>
+<ul>
+<li>Accept-Ranges: bytes  支持</li>
+<li>Accept-Ranges: none   不支持</li>
+</ul>
+<h3 id="Age"><a href="#Age" class="headerlink" title="Age"></a>Age</h3><p>告知客户端，源服务器在多久前创建了响应</p>
+<p><code>Age: 600</code> 单位：s</p>
+<h3 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h3><p>ETag是响应资源的唯一性标识，当资源改变，ETag也会变化</p>
+<ul>
+<li>强ETag：不论实体发生多么细微的变化都会改变其值 <code>ETag: &quot;usagi-1234&quot;</code></li>
+<li>弱ETag：只有资源发生了根本改变，产生差异时才会改变 ETag 值 <code>ETag: W/&quot;usagi-1234&quot;</code></li>
+</ul>
+<h3 id="Location"><a href="#Location" class="headerlink" title="Location"></a>Location</h3><p><code>Location: http://www.usagidesign.jp/sample.html</code></p>
+<p>引导客户端去指定位置请求资源，配合 3XX: Redirection</p>
+<h3 id="Proxy-Authenticate"><a href="#Proxy-Authenticate" class="headerlink" title="Proxy-Authenticate"></a>Proxy-Authenticate</h3><p><code>Proxy-Authenticate: Basic realm=&quot;Usagidesign Auth&quot;</code></p>
+<p>没搞懂</p>
+<h3 id="Retry-After"><a href="#Retry-After" class="headerlink" title="Retry-After"></a>Retry-After</h3><p><code>Retry-After: 120</code>，单位s，也可以是具体时间</p>
+<p>告知客户端，在多久后再次发送请求。配合 <code>503 Service Unavailable</code>或<code>3xx Redirect</code>使用</p>
+<h3 id="Server"><a href="#Server" class="headerlink" title="Server"></a>Server</h3><p>告知客户端，服务器上安装的HTTP服务器应用程序的信息。</p>
+<ul>
+<li><code>Server: Apache/2.2.17 (Unix)</code></li>
+<li><code>Server: Apache/2.2.6 (Unix) PHP/5.2.5</code></li>
+</ul>
+<h3 id="Vary"><a href="#Vary" class="headerlink" title="Vary"></a>Vary</h3>
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://zxffan.github.io/posts/8b77beaa.html" title="HTTP首部" target="_blank" rel="external">https://zxffan.github.io/posts/8b77beaa.html</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/fzxen" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpeg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/fzxen" target="_blank"><span class="text-dark">fzxen</span><small class="ml-1x">Web Developer &amp; Designer</small></a></h3>
+        <div>web developer</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/posts/46109b3a.html" title="Webpack5"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/posts/3b531846.html" title="HTTP梳理"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/fzxen" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/zxffan" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

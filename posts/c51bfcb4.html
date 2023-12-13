@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>WebRTC Introduction | Hexo</title>
+  <meta name="description" content="webRTC简介什么是webRTC？网络实时通信（Web Real Time Communication），用来实现浏览器之间的实时通信。通常用来传输音视频流，实现视频聊天、直播等功能。 兼容性 ie？ie就不应该有这种需求！！ webRTC中涉及到的概念 sdp：sdp描述了各端的能力（例如支持的音视频解放、传输协议等信息）。建立webRTC连接时，两端会交换对方的sdp。这样就知道对方的信息。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebRTC Introduction">
+<meta property="og:url" content="https://zxffan.github.io/posts/c51bfcb4.html">
+<meta property="og:site_name" content="zxfan">
+<meta property="og:description" content="webRTC简介什么是webRTC？网络实时通信（Web Real Time Communication），用来实现浏览器之间的实时通信。通常用来传输音视频流，实现视频聊天、直播等功能。 兼容性 ie？ie就不应该有这种需求！！ webRTC中涉及到的概念 sdp：sdp描述了各端的能力（例如支持的音视频解放、传输协议等信息）。建立webRTC连接时，两端会交换对方的sdp。这样就知道对方的信息。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zxffan.github.io/images/webrtc%E5%85%BC%E5%AE%B9%E6%80%A7.png">
+<meta property="og:image" content="https://zxffan.github.io/images/rtc%E8%BF%9E%E6%8E%A5%E6%97%B6%E5%BA%8F%E5%9B%BE.png">
+<meta property="og:image" content="https://zxffan.github.io/images/ice_candidate.png">
+<meta property="og:image" content="https://zxffan.github.io/images/candidate-list.png">
+<meta property="og:image" content="https://zxffan.github.io/images/%E4%BF%A1%E4%BB%A4%E6%9C%8D%E5%8A%A1.png">
+<meta property="article:published_time" content="2020-07-07T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-30T11:14:18.593Z">
+<meta property="article:author" content="zxfan">
+<meta property="article:tag" content="javascript">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="WebRTC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zxffan.github.io/images/webrtc%E5%85%BC%E5%AE%B9%E6%80%A7.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://zxffan.github.io/posts/c51bfcb4.html">
+  
+    <link rel="alternate" href="/atom.xml" title="zxfan" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/fzxen" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpeg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">fzxen</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Web Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Beijing, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/fzxen" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/zxffan" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS/">CSS</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Electron/">Electron</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/">JavaScript</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Media/">Media</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/NetWork/">NetWork</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rust/">Rust</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Server/">Server</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/experience/">experience</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/self/">self</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E7%A8%8B%E5%8C%96/">工程化</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AF%BB%E4%B9%A6/">读书</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithm/" rel="tag">Algorithm</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/" rel="tag">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Electron/" rel="tag">Electron</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/FrontEnd/" rel="tag">FrontEnd</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/" rel="tag">HTTP</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP-Header/" rel="tag">HTTP Header</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NetWork/" rel="tag">NetWork</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/" rel="tag">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nodejs/" rel="tag">Nodejs</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Number/" rel="tag">Number</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Promise/" rel="tag">Promise</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rust/" rel="tag">Rust</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Server/" rel="tag">Server</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Serverless/" rel="tag">Serverless</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP-IP/" rel="tag">TCP&#x2F;IP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript/" rel="tag">TypeScript</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/" rel="tag">WebRTC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/animation/" rel="tag">animation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/audio/" rel="tag">audio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/browser/" rel="tag">browser</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clean-architecture/" rel="tag">clean architecture</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crypto/" rel="tag">crypto</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/functional-programing/" rel="tag">functional programing</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/interview/" rel="tag">interview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/" rel="tag">javascript</a><span class="tag-list-count">24</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs/" rel="tag">nodejs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regExp/" rel="tag">regExp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssr/" rel="tag">ssr</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/" rel="tag">video</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-vitals/" rel="tag">web-vitals</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/" rel="tag">webpack</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%91%E8%AE%A1%E7%AE%97/" rel="tag">云计算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" rel="tag">位运算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1/" rel="tag">服务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF/" rel="tag">桌面端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF%E8%BD%AF%E4%BB%B6/" rel="tag">桌面端软件</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" rel="tag">语言学习</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Algorithm/" style="font-size: 13.63px;">Algorithm</a> <a href="/tags/C/" style="font-size: 13px;">C++</a> <a href="/tags/Electron/" style="font-size: 13.75px;">Electron</a> <a href="/tags/FrontEnd/" style="font-size: 13px;">FrontEnd</a> <a href="/tags/HTTP/" style="font-size: 13.25px;">HTTP</a> <a href="/tags/HTTP-Header/" style="font-size: 13px;">HTTP Header</a> <a href="/tags/JavaScript/" style="font-size: 13.88px;">JavaScript</a> <a href="/tags/NetWork/" style="font-size: 13.38px;">NetWork</a> <a href="/tags/Nginx/" style="font-size: 13px;">Nginx</a> <a href="/tags/Nodejs/" style="font-size: 13.5px;">Nodejs</a> <a href="/tags/Number/" style="font-size: 13px;">Number</a> <a href="/tags/Promise/" style="font-size: 13.13px;">Promise</a> <a href="/tags/Rust/" style="font-size: 13.38px;">Rust</a> <a href="/tags/Server/" style="font-size: 13px;">Server</a> <a href="/tags/Serverless/" style="font-size: 13px;">Serverless</a> <a href="/tags/TCP-IP/" style="font-size: 13px;">TCP/IP</a> <a href="/tags/TypeScript/" style="font-size: 13.63px;">TypeScript</a> <a href="/tags/Web/" style="font-size: 13px;">Web</a> <a href="/tags/WebRTC/" style="font-size: 13.13px;">WebRTC</a> <a href="/tags/animation/" style="font-size: 13px;">animation</a> <a href="/tags/audio/" style="font-size: 13px;">audio</a> <a href="/tags/browser/" style="font-size: 13px;">browser</a> <a href="/tags/clean-architecture/" style="font-size: 13px;">clean architecture</a> <a href="/tags/crypto/" style="font-size: 13px;">crypto</a> <a href="/tags/css/" style="font-size: 13.13px;">css</a> <a href="/tags/functional-programing/" style="font-size: 13px;">functional programing</a> <a href="/tags/interview/" style="font-size: 13px;">interview</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/nodejs/" style="font-size: 13px;">nodejs</a> <a href="/tags/regExp/" style="font-size: 13px;">regExp</a> <a href="/tags/ssr/" style="font-size: 13px;">ssr</a> <a href="/tags/video/" style="font-size: 13px;">video</a> <a href="/tags/vue/" style="font-size: 13.75px;">vue</a> <a href="/tags/vue2/" style="font-size: 13px;">vue2</a> <a href="/tags/web-vitals/" style="font-size: 13px;">web-vitals</a> <a href="/tags/webpack/" style="font-size: 13.63px;">webpack</a> <a href="/tags/%E4%BA%91%E8%AE%A1%E7%AE%97/" style="font-size: 13px;">云计算</a> <a href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size: 13px;">位运算</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 13px;">前端</a> <a href="/tags/%E5%AE%89%E5%85%A8/" style="font-size: 13px;">安全</a> <a href="/tags/%E6%9C%8D%E5%8A%A1/" style="font-size: 13px;">服务</a> <a href="/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 13.63px;">架构</a> <a href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF/" style="font-size: 13px;">桌面端</a> <a href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF%E8%BD%AF%E4%BB%B6/" style="font-size: 13.63px;">桌面端软件</a> <a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 13.38px;">网络</a> <a href="/tags/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" style="font-size: 13.25px;">语言学习</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">七月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">九月 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AF%BB%E4%B9%A6/">读书</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/a8730dfb.html" class="title">架构整洁之道</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-10-29T16:00:00.000Z" itemprop="datePublished">2021-10-30</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/experience/">experience</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/673cef84.html" class="title">认识ProtocolBuffers</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-07-15T16:00:00.000Z" itemprop="datePublished">2021-07-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/experience/">experience</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/6f842db3.html" class="title">Crypto</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-06-19T16:00:00.000Z" itemprop="datePublished">2021-06-20</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/self/">self</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/33f3fd9d.html" class="title">字节跳动面试</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-06-04T16:00:00.000Z" itemprop="datePublished">2021-06-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/CSS/">CSS</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/d8bddba6.html" class="title">clear 清除浮动</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-05-30T16:00:00.000Z" itemprop="datePublished">2021-05-31</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#webRTC%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">webRTC简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFwebRTC%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是webRTC？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%BC%E5%AE%B9%E6%80%A7"><span class="toc-number">1.2.</span> <span class="toc-text">兼容性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#webRTC%E4%B8%AD%E6%B6%89%E5%8F%8A%E5%88%B0%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="toc-number">2.</span> <span class="toc-text">webRTC中涉及到的概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5"><span class="toc-number">3.</span> <span class="toc-text">建立连接</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9E%E6%8E%A5%E6%B5%81%E7%A8%8B"><span class="toc-number">3.1.</span> <span class="toc-text">连接流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E7%A0%81"><span class="toc-number">3.2.</span> <span class="toc-text">编码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#candidate"><span class="toc-number">4.</span> <span class="toc-text">candidate</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9E%E6%8E%A5%E6%B5%81%E7%A8%8B-1"><span class="toc-number">4.1.</span> <span class="toc-text">连接流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E7%A0%81-1"><span class="toc-number">4.2.</span> <span class="toc-text">编码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#STUN-x2F-TURN"><span class="toc-number">5.</span> <span class="toc-text">STUN&#x2F;TURN</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#STUN"><span class="toc-number">5.1.</span> <span class="toc-text">STUN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TURN"><span class="toc-number">5.2.</span> <span class="toc-text">TURN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%83%A8%E7%BD%B2STUN-x2F-TURN"><span class="toc-number">5.3.</span> <span class="toc-text">部署STUN&#x2F;TURN</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#candidate%E5%88%97%E8%A1%A8"><span class="toc-number">5.4.</span> <span class="toc-text">candidate列表</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%A1%E4%BB%A4%E6%9C%8D%E5%8A%A1"><span class="toc-number">6.</span> <span class="toc-text">信令服务</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E5%BF%B5"><span class="toc-number">6.1.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B5%81%E7%A8%8B"><span class="toc-number">6.2.</span> <span class="toc-text">流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E7%A0%81-2"><span class="toc-number">6.3.</span> <span class="toc-text">编码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E9%80%9A%E9%81%93%EF%BC%88RTCDataChannel%EF%BC%89"><span class="toc-number">7.</span> <span class="toc-text">数据通道（RTCDataChannel）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E5%BF%B5-1"><span class="toc-number">7.1.</span> <span class="toc-text">概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%8C%E5%90%91%E9%80%9A%E4%BF%A1"><span class="toc-number">7.2.</span> <span class="toc-text">双向通信</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="toc-number">7.3.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#In-band"><span class="toc-number">7.3.1.</span> <span class="toc-text">In-band</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#out-of-band"><span class="toc-number">7.3.2.</span> <span class="toc-text">out-of-band</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WebRTC%E8%83%8C%E5%90%8E%E7%9A%84%E5%8E%9F%E7%90%86"><span class="toc-number">8.</span> <span class="toc-text">WebRTC背后的原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#UDP"><span class="toc-number">8.1.</span> <span class="toc-text">UDP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E7%A0%81%E5%B8%A7"><span class="toc-number">8.2.</span> <span class="toc-text">编码帧</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RTP"><span class="toc-number">8.3.</span> <span class="toc-text">RTP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RTCP"><span class="toc-number">8.4.</span> <span class="toc-text">RTCP</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RTCDataChannel"><span class="toc-number">8.5.</span> <span class="toc-text">RTCDataChannel</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%80%9A%E4%BF%A1%E6%95%B0%E6%8D%AE"><span class="toc-number">9.</span> <span class="toc-text">通信数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B4%A8%E9%87%8F%E6%8C%87%E6%A0%87"><span class="toc-number">9.1.</span> <span class="toc-text">质量指标</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Media/webRTC_introduction" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      WebRTC Introduction
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/posts/c51bfcb4.html" class="article-date">
+	  <time datetime="2020-07-07T16:00:00.000Z" itemprop="datePublished">2020-07-08</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Media/">Media</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/WebRTC/" rel="tag">WebRTC</a>, <a class="article-tag-link-link" href="/tags/javascript/" rel="tag">javascript</a>, <a class="article-tag-link-link" href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/posts/c51bfcb4.html#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="webRTC简介"><a href="#webRTC简介" class="headerlink" title="webRTC简介"></a>webRTC简介</h2><h3 id="什么是webRTC？"><a href="#什么是webRTC？" class="headerlink" title="什么是webRTC？"></a>什么是webRTC？</h3><p>网络实时通信（Web Real Time Communication），用来实现浏览器之间的实时通信。通常用来传输音视频流，实现视频聊天、直播等功能。</p>
+<h3 id="兼容性"><a href="#兼容性" class="headerlink" title="兼容性"></a>兼容性</h3><p><img src="/../../images/webrtc%E5%85%BC%E5%AE%B9%E6%80%A7.png" alt="pic"></p>
+<p>ie？ie就不应该有这种需求！！</p>
+<h2 id="webRTC中涉及到的概念"><a href="#webRTC中涉及到的概念" class="headerlink" title="webRTC中涉及到的概念"></a>webRTC中涉及到的概念</h2><ol>
+<li>sdp：sdp描述了各端的能力（例如支持的音视频解放、传输协议等信息）。建立webRTC连接时，两端会交换对方的sdp。这样就知道对方的信息。<ol>
+<li>offer：通常先发送sdp一方的sdp被称为offer</li>
+<li>answer：另一方收到offer后发送的sdp被称为answer</li>
+</ol>
+</li>
+<li>ice candidate：包含了 WebRTC 与远端通信时使用的协议、IP 地址和端口等数据。当双端交换完sdp数据后，就会收集candidate信息。同样双端也要交换candidate数据</li>
+<li>NAT： 网络地址转换。由于ipv4地址不够用，我们的个人pc在本地使用的是内网ip（例如:192.168.1.2）。当访问公网上的资源是，请求经过路由器时，会将内网地址转换成公网地址，再发给目的服务器</li>
+<li>p2p：点对点（peer to peer）。指连接双端直接通信，不需要经过中间服务器。webRTC就能实现p2p，只有当p2p失败才会采用服务器中继</li>
+</ol>
+<h2 id="建立连接"><a href="#建立连接" class="headerlink" title="建立连接"></a>建立连接</h2><h3 id="连接流程"><a href="#连接流程" class="headerlink" title="连接流程"></a>连接流程</h3><p><img src="/../../images/rtc%E8%BF%9E%E6%8E%A5%E6%97%B6%E5%BA%8F%E5%9B%BE.png" alt="连接流程"></p>
+<h3 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A 端</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">sendToB</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// ...发送给B</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">onMsgFromB</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">    <span class="comment">// 获得来自B的数据</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getStreamFromA</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// 获取A的音视频流</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 1. 先建立rtc连接</span></span><br><span class="line"><span class="keyword">const</span> pc = <span class="keyword">new</span> <span class="title class_">RTCpeerConnection</span>()</span><br><span class="line"><span class="comment">// 2. 添加音视频流</span></span><br><span class="line"><span class="keyword">const</span> stream = <span class="title function_">getStreamFromA</span>()</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> track <span class="keyword">of</span> stream.<span class="title function_">getTracks</span>()) &#123;</span><br><span class="line">    pc.<span class="title function_">addTrack</span>(track);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. 创建offer</span></span><br><span class="line">pc.<span class="title function_">createOffer</span>().<span class="title function_">then</span>(<span class="function"><span class="params">offer</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 4.设置本地</span></span><br><span class="line">    pc.<span class="title function_">setLocalDescription</span>(offer)</span><br><span class="line">    <span class="comment">// 5. 将offer发送给B</span></span><br><span class="line">    <span class="title function_">sendToB</span>(&#123;<span class="attr">type</span>: <span class="string">&#x27;offer&#x27;</span>, <span class="attr">data</span>: offer&#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="title function_">onMsgFromB</span>(<span class="function">(<span class="params">&#123;<span class="keyword">type</span>, data&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">type</span> === <span class="string">&#x27;answer&#x27;</span>) &#123;</span><br><span class="line">        <span class="comment">// 12.设置远程answer</span></span><br><span class="line">        pc.<span class="title function_">setRemoteDescription</span>(data)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">pc.<span class="property">ontrack</span> = <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> stream = e.<span class="property">streams</span>[<span class="number">0</span>]</span><br><span class="line">    video.<span class="property">srcObject</span> = stream <span class="comment">// 播放流</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// B端</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">sendToA</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// ...发送给A</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">onMsgFromA</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">    <span class="comment">// 获得来自A的数据</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">getStreamFromA</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// 获取B的音视频流</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 6. 先建立rtc连接</span></span><br><span class="line"><span class="keyword">const</span> pc = <span class="keyword">new</span> <span class="title class_">RTCpeerConnection</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 7. 添加音视频流</span></span><br><span class="line"><span class="keyword">const</span> stream = <span class="title function_">getStreamFromA</span>()</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">const</span> track <span class="keyword">of</span> stream.<span class="title function_">getTracks</span>()) &#123;</span><br><span class="line">    pc.<span class="title function_">addTrack</span>(track);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">onMsgFromB</span>(<span class="function">(<span class="params">&#123;<span class="keyword">type</span>, data&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">type</span> === <span class="string">&#x27;offer&#x27;</span>) &#123;</span><br><span class="line">        <span class="comment">// 8. 设置offer</span></span><br><span class="line">        pc.<span class="title function_">setRemoteDescription</span>(data)</span><br><span class="line">        <span class="comment">// 9.创建answer</span></span><br><span class="line">        pc.<span class="title function_">createAnswer</span>().<span class="title function_">then</span>(<span class="function"><span class="params">answer</span> =&gt;</span> &#123;</span><br><span class="line">            <span class="comment">// 10.设置本地</span></span><br><span class="line">            pc.<span class="title function_">setLocalDescription</span>(answer)</span><br><span class="line">            <span class="comment">// 11. 将answer发送给A</span></span><br><span class="line">            <span class="title function_">sendToB</span>(&#123;<span class="attr">type</span>: <span class="string">&#x27;answer&#x27;</span>, <span class="attr">data</span>: answer&#125;)</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">pc.<span class="property">ontrack</span> = <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> stream = e.<span class="property">streams</span>[<span class="number">0</span>]</span><br><span class="line">    video.<span class="property">srcObject</span> = stream <span class="comment">// 播放流</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>添加流用的是addTrack没有使用addStream（即将废弃）。addtrack 和 ontrack 是最新的API。</p>
+<p>视频流的获取，请参考另一篇文章<a href="https://zxffan.github.io/posts/4dbf3745.html">浏览器中的音视频</a></p>
+</blockquote>
+<h2 id="candidate"><a href="#candidate" class="headerlink" title="candidate"></a>candidate</h2><p>双端交换sdp后，并未真正建立连接。然后还需要收集双方的candidate（不止一个哦）并交换。然后浏览器会按照candidate列表逐一测试连通性，直到有一条candidate连接，webRTC连接才算真正的建立。</p>
+<h3 id="连接流程-1"><a href="#连接流程-1" class="headerlink" title="连接流程"></a>连接流程</h3><p><img src="/../../images/ice_candidate.png" alt="ice candidate"></p>
+<p>STUN和TURN下面会展开，暂且理解为部署在服务器上的服务，用来获取数据生成candidate的。</p>
+<h3 id="编码-1"><a href="#编码-1" class="headerlink" title="编码"></a>编码</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 基于上面修改</span></span><br><span class="line"><span class="comment">// 1. 请求， RTCpeerConnection会自己做</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// A 端</span></span><br><span class="line"><span class="comment">// 2. 服务器（STUN/TURN）返回candidate</span></span><br><span class="line">pc.<span class="property">onicecandidate</span> = <span class="function">(<span class="params">iceEvent</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 3. 发送iceEvent(或者直接发送candidate也可以)给B端</span></span><br><span class="line">    <span class="title function_">sendToB</span>(&#123;<span class="attr">type</span>: <span class="string">&#x27;candidate&#x27;</span>, <span class="attr">data</span>: iceEvent&#125;)</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">onMsgFromB</span>(<span class="function">(<span class="params">&#123;<span class="keyword">type</span>, data&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">type</span> === <span class="string">&#x27;candidate&#x27;</span>) &#123;</span><br><span class="line">        pc.<span class="title function_">addIceCandidate</span>(data.<span class="property">candidate</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// B 端</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 5. 服务器（STUN/TURN）返回candidate</span></span><br><span class="line">pc.<span class="property">onicecandidate</span> = <span class="function">(<span class="params">iceEvent</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 6. 发送iceEventf给A端</span></span><br><span class="line">    <span class="title function_">sendToA</span>(&#123;<span class="attr">type</span>: <span class="string">&#x27;candidate&#x27;</span>, <span class="attr">data</span>: iceEvent&#125;)</span><br><span class="line">&#125;</span><br><span class="line"><span class="title function_">onMsgFromB</span>(<span class="function">(<span class="params">&#123;<span class="keyword">type</span>, data&#125;</span>) =&gt;</span> &#123;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span>(<span class="keyword">type</span> === <span class="string">&#x27;candidate&#x27;</span>) &#123;</span><br><span class="line">        <span class="comment">// 4. 设置A端发来的的candidate</span></span><br><span class="line">        pc.<span class="title function_">addIceCandidate</span>(data.<span class="property">candidate</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="STUN-x2F-TURN"><a href="#STUN-x2F-TURN" class="headerlink" title="STUN&#x2F;TURN"></a>STUN&#x2F;TURN</h2><p>STUN和TURN是两个服务，RTCPeerConnection会自动请求这两个服务来获取candidate。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 基于上面的代码</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// A端 &amp; B端</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 建立RTCpeerConnection时，配置服务地址</span></span><br><span class="line"><span class="keyword">const</span> pc = <span class="keyword">new</span> <span class="title class_">RTCpeerConnection</span>(&#123;</span><br><span class="line">  <span class="attr">iceServers</span>: [</span><br><span class="line">    &#123; <span class="attr">urls</span>: <span class="string">&quot;stun:47.94.xxx.xx:3478&quot;</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">urls</span>: <span class="string">&quot;turn:47.94.xxx.xx:3478&quot;</span>, <span class="attr">username</span>: <span class="string">&quot;usrname&quot;</span>, <span class="attr">credential</span>: <span class="string">&quot;password&quot;</span> &#125;,</span><br><span class="line">  ],</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="STUN"><a href="#STUN" class="headerlink" title="STUN"></a>STUN</h3><p>两个处于不同网段的客户端需要点对点通信必须知道对方的公网ip，并且在双方的NAT映射表中必须有一条映射记录。STUN服务用来获取公网地址。处于不同网段的两台客户端，需要访问STUN服务来获取其公网地址。</p>
+<h3 id="TURN"><a href="#TURN" class="headerlink" title="TURN"></a>TURN</h3><p>当点对点通信失败后，将会采用中继的方式。也就是数据走服务器转发。TURN就是用来实现中继的。</p>
+<h3 id="部署STUN-x2F-TURN"><a href="#部署STUN-x2F-TURN" class="headerlink" title="部署STUN&#x2F;TURN"></a>部署STUN&#x2F;TURN</h3><p><code>conturn</code>应该是比较知名的STUN&#x2F;TURN服务器。</p>
+<p>如何部署请自行查阅资料，或参考官方<a target="_blank" rel="noopener" href="https://github.com/coturn/coturn">git repo</a></p>
+<h3 id="candidate列表"><a href="#candidate列表" class="headerlink" title="candidate列表"></a>candidate列表</h3><p>以下测试，A端（192.168.1.134）和B端（192.168.1.134）都是我本机。</p>
+<p>webRTC的candidate分为三类</p>
+<ul>
+<li>host 类型，即本机内网的 IP 和端口</li>
+<li>srflx 类型, 即本机 NAT 映射后的外网的 IP 和端口</li>
+<li>relay 类型，即中继服务器的 IP 和端口</li>
+</ul>
+<p><img src="/../../images/candidate-list.png" alt="candidate-list"></p>
+<ol>
+<li>webRTC会先测试host类型的candidate。这种类型时最容易收集的。就算没有配置STUN&#x2F;TURN也能收集到。如果测通了就没必要往下测试了。</li>
+<li>srflx类型的candidate包含公网ip信息。它是从stun服务器获取的。</li>
+<li>当前两种都没连通，就会测试relay类型的candidate，也就是通过turn服务进行中继。</li>
+</ol>
+<h2 id="信令服务"><a href="#信令服务" class="headerlink" title="信令服务"></a>信令服务</h2><p>前面写了这么一段代码</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A端</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">sendToB</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="comment">// ...发送给B</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">function</span> <span class="title function_">onMsgFromB</span>(<span class="params">callback</span>) &#123;</span><br><span class="line">    <span class="comment">// 获得来自B的数据</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// B端同理</span></span><br></pre></td></tr></table></figure>
+
+<p>埋了一个伏笔，sendToB如何实现。答案就是信令服务</p>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>信令服务就是在通信的双端之间搭建的一个用于建立webRTC连接的服务，用于转发sdp、candidate等。</p>
+<p>信令服务可以是一个webSocket服务，用来进行A、B端之间的媒体协商。</p>
+<blockquote>
+<p>媒体协商就是指交换sdp和candidate的过程</p>
+</blockquote>
+<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><p><img src="/../../images/%E4%BF%A1%E4%BB%A4%E6%9C%8D%E5%8A%A1.png" alt="信令服务"></p>
+<h3 id="编码-2"><a href="#编码-2" class="headerlink" title="编码"></a>编码</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title class_">WebSocket</span> = <span class="built_in">require</span>(<span class="string">&quot;ws&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> wss = <span class="keyword">new</span> <span class="title class_">WebSocket</span>.<span class="title class_">Server</span>(&#123; <span class="attr">port</span>: <span class="number">3001</span> &#125;);</span><br><span class="line"><span class="keyword">const</span> code2Ws = <span class="keyword">new</span> <span class="title class_">Map</span>();</span><br><span class="line"></span><br><span class="line">wss.<span class="title function_">on</span>(<span class="string">&quot;connection&quot;</span>, <span class="function">(<span class="params">ws, request</span>) =&gt;</span> &#123;</span><br><span class="line">  ws.<span class="property">isAlive</span> = <span class="literal">true</span>;</span><br><span class="line">  <span class="keyword">let</span> code;</span><br><span class="line">  ws.<span class="property">sendData</span> = <span class="function">(<span class="params">event, data</span>) =&gt;</span> &#123;</span><br><span class="line">    ws.<span class="title function_">send</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(&#123; event, data &#125;));</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  ws.<span class="property">sendError</span> = <span class="function">(<span class="params">msg</span>) =&gt;</span> ws.<span class="title function_">sendData</span>(<span class="string">&quot;error&quot;</span>, msg);</span><br><span class="line"></span><br><span class="line">  ws.<span class="title function_">on</span>(<span class="string">&quot;message&quot;</span>, <span class="function">(<span class="params">message</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> parsedMsg = <span class="title class_">JSON</span>.<span class="title function_">parse</span>(message);</span><br><span class="line">      <span class="keyword">const</span> &#123; event, data &#125; = parsedMsg;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">switch</span> (event) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&quot;login&quot;</span>:</span><br><span class="line">          <span class="comment">//  为客户端生成唯一标识，也可以由客户端发送标识（如mac地址）</span></span><br><span class="line">          code = data.<span class="property">code</span> || <span class="title class_">Math</span>.<span class="title function_">floor</span>(<span class="title class_">Math</span>.<span class="title function_">random</span>() * (<span class="number">9999999</span> - <span class="number">1000000</span>)) + <span class="number">100000</span> + <span class="string">&quot;&quot;</span>;</span><br><span class="line">          code2Ws.<span class="title function_">set</span>(code, ws); <span class="comment">// 记录</span></span><br><span class="line">          ws.<span class="title function_">sendData</span>(<span class="string">&quot;login&quot;</span>, &#123; code &#125;); <span class="comment">// 范围标识</span></span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&quot;communicate&quot;</span>:</span><br><span class="line">          <span class="keyword">const</span> remote = data.<span class="property">remote</span>; <span class="comment">// 需要通信的客户端标识</span></span><br><span class="line">          <span class="keyword">if</span> (code2Ws.<span class="title function_">has</span>(remote)) &#123; <span class="comment">// 存在就建立两端之间的映射关系</span></span><br><span class="line">            ws.<span class="title function_">sendData</span>(<span class="string">&quot;communicate&quot;</span>, &#123; <span class="attr">success</span>: <span class="literal">true</span> &#125;); <span class="comment">// 通知A端</span></span><br><span class="line">            ws.<span class="property">sendRemote</span> = code2Ws.<span class="title function_">get</span>(remote).<span class="property">sendData</span>;</span><br><span class="line">            code2Ws.<span class="title function_">get</span>(remote).<span class="property">sendRemote</span> = ws.<span class="property">sendData</span>;</span><br><span class="line">            ws.<span class="title function_">sendRemote</span>(<span class="string">&quot;communicate&quot;</span>, &#123; <span class="attr">remote</span>: code &#125;); <span class="comment">// 通知B端</span></span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ws.<span class="title function_">sendData</span>(<span class="string">&quot;communicate&quot;</span>, &#123; <span class="attr">success</span>: <span class="literal">false</span> &#125;); <span class="comment">// 没有，则通知A，失败</span></span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="string">&quot;forward&quot;</span>:</span><br><span class="line">          ws.<span class="property">sendRemote</span> &amp;&amp; ws.<span class="title function_">sendRemote</span>(data); <span class="comment">// 转发消息</span></span><br><span class="line">          <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">      ws.<span class="title function_">sendError</span>(<span class="string">&quot;message invalid&quot;</span>);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 连接关闭 就删除当前客户端的标识</span></span><br><span class="line">  ws.<span class="title function_">on</span>(<span class="string">&quot;close&quot;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    code2Ws.<span class="title function_">delete</span>(code);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 定时检测连接</span></span><br><span class="line"><span class="keyword">const</span> interval = <span class="built_in">setInterval</span>(<span class="keyword">function</span> <span class="title function_">ping</span>(<span class="params"></span>) &#123;</span><br><span class="line">  wss.<span class="property">clients</span>.<span class="title function_">forEach</span>(<span class="keyword">function</span> <span class="title function_">each</span>(<span class="params">ws</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (ws.<span class="property">isAlive</span> === <span class="literal">false</span>) <span class="keyword">return</span> ws.<span class="title function_">terminate</span>();</span><br><span class="line"></span><br><span class="line">    ws.<span class="property">isAlive</span> = <span class="literal">false</span>;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;, <span class="number">5</span> * <span class="number">60</span> * <span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">wss.<span class="title function_">on</span>(<span class="string">&quot;close&quot;</span>, <span class="keyword">function</span> <span class="title function_">close</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="built_in">clearInterval</span>(interval);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="数据通道（RTCDataChannel）"><a href="#数据通道（RTCDataChannel）" class="headerlink" title="数据通道（RTCDataChannel）"></a>数据通道（RTCDataChannel）</h2><p>媒体协商一旦完成就可以关闭与信令服务的连接即关闭webSocket连接。之后的数据传输可以通过<code>数据通道</code>来传输。</p>
+<h3 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a>概念</h3><p>建立webRTC连接的两端能够开辟一个数据通道，用来传输非音视频流数据，比如文字聊天、文件传输、远程桌面、游戏控制、P2P 加速等。</p>
+<h3 id="双向通信"><a href="#双向通信" class="headerlink" title="双向通信"></a>双向通信</h3><p>RTCDataChannel可以实现双向通信，有两种模式</p>
+<ul>
+<li><code>In-band</code>(默认)：假设通信双方中的一方调用 createDataChannel 创建 RTCDataChannel 对象时，将 options 参数中的 negotiated 字段设置为 false，则通信的另一方就可以通过它的 RTCPeerConnection 对象的 ondatachannel 事件来得到与对方通信的 RTCDataChannel 对象了，这种方式就是 In-band 协商方式。</li>
+<li><code>out-of-band</code>：这种方式不再是一端调用 createDataChannel，另一端监听 ondatachannel 事件，从而实现双方的数据通信；而是两端都调用 createDataChannel 方法创建 RTCDataChannel 对象，再通过 ID 绑定来实现双方的数据通信。</li>
+</ul>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><h4 id="In-band"><a href="#In-band" class="headerlink" title="In-band"></a>In-band</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A端</span></span><br><span class="line"><span class="keyword">const</span> pc = <span class="keyword">new</span> <span class="title class_">RTCPeerConnection</span>();</span><br><span class="line"><span class="keyword">const</span> dc = pc.<span class="title function_">createDataChannel</span>(<span class="string">&quot;my channel&quot;</span>, &#123; <span class="attr">negotiated</span>: <span class="literal">true</span> &#125;);</span><br><span class="line"></span><br><span class="line">dc.<span class="property">onmessage</span> = <span class="keyword">function</span> (<span class="params">event</span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;received: &quot;</span> + event.<span class="property">data</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">dc.<span class="property">onopen</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;datachannel open&quot;</span>);</span><br><span class="line">  ds.<span class="title function_">send</span>(<span class="string">&quot;hello!&quot;</span>)</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">dc.<span class="property">onclose</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;datachannel close&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// B端</span></span><br><span class="line">pc.<span class="property">ondatachannel</span> = <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> dc = e.<span class="property">channel</span> <span class="comment">// 获取</span></span><br><span class="line">    dc.<span class="property">onmessage</span> = <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(e.<span class="property">data</span>)</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h4 id="out-of-band"><a href="#out-of-band" class="headerlink" title="out-of-band"></a>out-of-band</h4><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// A 端</span></span><br><span class="line"><span class="keyword">const</span> pc = <span class="keyword">new</span> <span class="title class_">RTCPeerConnection</span>();</span><br><span class="line"><span class="keyword">const</span> dc = pc.<span class="title function_">createDataChannel</span>(<span class="string">&quot;my channel&quot;</span>, &#123; <span class="attr">negotiated</span>: <span class="literal">true</span>, <span class="attr">id</span>: <span class="number">0</span> &#125;);</span><br><span class="line"></span><br><span class="line">dc.<span class="property">onmessage</span> = <span class="keyword">function</span> (<span class="params">event</span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;received: &quot;</span> + event.<span class="property">data</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">dc.<span class="property">onopen</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;datachannel open&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">dc.<span class="property">onclose</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;datachannel close&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// B 端</span></span><br><span class="line"><span class="keyword">const</span> pc = <span class="keyword">new</span> <span class="title class_">RTCPeerConnection</span>(&#123; <span class="attr">negotiated</span>: <span class="literal">true</span>, <span class="attr">id</span>: <span class="number">0</span> &#125;);</span><br><span class="line"><span class="keyword">const</span> dc = pc.<span class="title function_">createDataChannel</span>(<span class="string">&quot;my channel&quot;</span>);</span><br><span class="line"></span><br><span class="line">dc.<span class="property">onmessage</span> = <span class="keyword">function</span> (<span class="params">event</span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;received: &quot;</span> + event.<span class="property">data</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">dc.<span class="property">onopen</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;datachannel open&quot;</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">dc.<span class="property">onclose</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;datachannel close&quot;</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：RTCDataChannel对象需要在媒体协商前创建。</p>
+</blockquote>
+<h2 id="WebRTC背后的原理"><a href="#WebRTC背后的原理" class="headerlink" title="WebRTC背后的原理"></a>WebRTC背后的原理</h2><h3 id="UDP"><a href="#UDP" class="headerlink" title="UDP"></a>UDP</h3><p><code>WebRTC</code>使用的是<code>UDP</code>协议。这是为了保证实时性。TCP有超时重传机制，这回导致很高的传输延迟。</p>
+<h3 id="编码帧"><a href="#编码帧" class="headerlink" title="编码帧"></a>编码帧</h3><p>通过编码器（如 H264&#x2F;H265、VP8&#x2F;VP9）压缩后的帧称为编码帧。这里我们以 H264 为例，经过 H264 编码的帧包括以下三种类型。</p>
+<ul>
+<li>I 帧：关键帧。压缩率低，可以单独解码成一幅完整的图像。</li>
+<li>P 帧：参考帧。压缩率较高，解码时依赖于前面已解码的数据。</li>
+<li>B 帧：前后参考帧。压缩率最高，解码时不光依赖前面已经解码的帧，而且还依赖它后面的 P 帧。换句话说就是，B 帧后面的 P 帧要优先于它进行解码，然后才能将 B 帧解码。</li>
+</ul>
+<blockquote>
+<p>解码过后的帧叫做<strong>非编码帧</strong></p>
+</blockquote>
+<h3 id="RTP"><a href="#RTP" class="headerlink" title="RTP"></a>RTP</h3><p>一般情况下，在实时互动直播系统传输音视频数据流时，我们并不直接将音视频数据流交给 UDP 传输，而是先给音视频数据加个 <code>RTP 头</code>，然后再交给 UDP 进行传输。</p>
+<p>这是因为一个I帧数据量是很大的。一个UDP报文是无法全部传输完的。所以发送是需要拆分并要加上首部，在接收的时候再组装</p>
+<h3 id="RTCP"><a href="#RTCP" class="headerlink" title="RTCP"></a>RTCP</h3><p>UDP是不可靠传输，所以在使用 RTP 包传输数据时，难免会发生丢包、乱序、抖动等问题。</p>
+<p>RTCP协议则负责流媒体的传输质量保证，提供流量控制和拥塞控制等服务。在RTP会话期间，各参与者周期性彼此发送RTCP报文。报文中包含各参与者数据发送和接收等统计信息，参与者可以据此动态控制流媒体传输质量</p>
+<h3 id="RTCDataChannel"><a href="#RTCDataChannel" class="headerlink" title="RTCDataChannel"></a>RTCDataChannel</h3><p> <code>RTCDataChannel</code>使用的是<code>SCTP</code>协议（底层也是基于<code>UDP</code>），它基于UDP实现了流量控制和拥塞控制等功能。而且它可以配置UDP报文传输的<strong>有序性</strong>和<strong>可靠性</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> dc = pc.<span class="title function_">createDataChannel</span>(<span class="string">&quot;dc&quot;</span>, &#123; </span><br><span class="line">  <span class="attr">ordered</span>: <span class="literal">false</span>, <span class="comment">// 是否有序</span></span><br><span class="line">  <span class="attr">maxPacketLifeTime</span>: <span class="number">3000</span>,<span class="comment">// 重传消息失败的最长时间。也就是说超过这个时间后，即使消息重传失败了也不再进行重传了。</span></span><br><span class="line">  <span class="attr">maxRetransmits</span>: <span class="number">10</span>, <span class="comment">// 重传消息失败的最大次数</span></span><br><span class="line">  </span><br><span class="line">&#125;); <span class="comment">//创建 RTCDataChannel对象</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="通信数据"><a href="#通信数据" class="headerlink" title="通信数据"></a>通信数据</h2><ol>
+<li>通过浏览器（chrome），可以查看通信质量信息<code>chrome://webrtc-internals</code></li>
+<li>调用<code>RTCPeerConnection</code>对象的<code>getStats</code>方法获取数据</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获得速个连接的统计信息</span></span><br><span class="line"><span class="comment">//在一个连接中有很多 report</span></span><br><span class="line">pc.<span class="title function_">getStats</span>().<span class="title function_">then</span>(<span class="function"><span class="params">reports</span> =&gt;</span> &#123; </span><br><span class="line">  <span class="comment">//遍历每个 report </span></span><br><span class="line">  reports.<span class="title function_">forEach</span>(<span class="function"><span class="params">report</span> =&gt;</span> &#123; <span class="comment">//将每个 report 的详细信息打印出来 </span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(report); </span><br><span class="line">  &#125;);</span><br><span class="line">&#125;).<span class="title function_">catch</span>( <span class="function"><span class="params">err</span>=&gt;</span>&#123; <span class="variable language_">console</span>.<span class="title function_">error</span>(err); &#125;););</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>只获取与发送&#x2F;接受相关的数据</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> pc = <span class="keyword">new</span> <span class="title class_">RTCPeerConnection</span>(<span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//从 PC 上获得 sender 对象</span></span><br><span class="line"><span class="keyword">var</span> sender = pc.<span class="title function_">getSenders</span>()[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line"><span class="comment">//调用sender的 getStats 方法    </span></span><br><span class="line">sender.<span class="title function_">getStats</span>()</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function"><span class="params">reports</span> =&gt;</span> &#123; <span class="comment">//得到相关的报告</span></span><br><span class="line">  	reports.<span class="title function_">forEach</span>(<span class="function"><span class="params">report</span> =&gt;</span>&#123; <span class="comment">//遍历每个报告</span></span><br><span class="line">      <span class="keyword">if</span>(report.<span class="property">type</span> === <span class="string">&#x27;outbound-rtp&#x27;</span>)&#123; <span class="comment">//如果是rtp输出流</span></span><br><span class="line">        <span class="comment">// ....</span></span><br><span class="line">      &#125;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="质量指标"><a href="#质量指标" class="headerlink" title="质量指标"></a>质量指标</h3><ol>
+<li>packetsSent&#x2F;packetsRecived：发送&#x2F;接受包的数量，计算丢包率</li>
+<li></li>
+</ol>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://zxffan.github.io/posts/c51bfcb4.html" title="WebRTC Introduction" target="_blank" rel="external">https://zxffan.github.io/posts/c51bfcb4.html</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/fzxen" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpeg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/fzxen" target="_blank"><span class="text-dark">fzxen</span><small class="ml-1x">Web Developer &amp; Designer</small></a></h3>
+        <div>web developer</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/posts/4dbf3745.html" title="浏览器中的音视频"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/posts/2f57a694.html" title="正则表达式"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/fzxen" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/zxffan" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

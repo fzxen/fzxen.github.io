@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>Nodejs搭建服务端 | Hexo</title>
+  <meta name="description" content="服务端服务端顾名思义就是提供服务的一方。 先回顾一下四层模型：应用层（最顶层）-&gt; 传输层 -&gt; 网络层 -&gt; 数据链路层（最底层） 其中传输层使用的是TCP&#x2F;UDP协议应用层使用的协议有http、ftp等 任何一种网络服务都必须遵从一种协议。 nodejs内置了若干模块，实现了常见的网络协议，并向用户提供了便利的接口。  四层模型只是理论模型  Net模块net模块在认识RPC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nodejs搭建服务端">
+<meta property="og:url" content="https://zxffan.github.io/posts/9e0c0ca5.html">
+<meta property="og:site_name" content="zxfan">
+<meta property="og:description" content="服务端服务端顾名思义就是提供服务的一方。 先回顾一下四层模型：应用层（最顶层）-&gt; 传输层 -&gt; 网络层 -&gt; 数据链路层（最底层） 其中传输层使用的是TCP&#x2F;UDP协议应用层使用的协议有http、ftp等 任何一种网络服务都必须遵从一种协议。 nodejs内置了若干模块，实现了常见的网络协议，并向用户提供了便利的接口。  四层模型只是理论模型  Net模块net模块在认识RPC">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zxffan.github.io/images/nodejs/%E4%B8%AD%E9%97%B4%E4%BB%B6%E6%B4%8B%E8%91%B1%E6%A8%A1%E5%9E%8B.png">
+<meta property="article:published_time" content="2021-01-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-30T11:14:18.595Z">
+<meta property="article:author" content="zxfan">
+<meta property="article:tag" content="Nodejs">
+<meta property="article:tag" content="服务">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zxffan.github.io/images/nodejs/%E4%B8%AD%E9%97%B4%E4%BB%B6%E6%B4%8B%E8%91%B1%E6%A8%A1%E5%9E%8B.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://zxffan.github.io/posts/9e0c0ca5.html">
+  
+    <link rel="alternate" href="/atom.xml" title="zxfan" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/fzxen" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpeg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">fzxen</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Web Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Beijing, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/fzxen" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/zxffan" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS/">CSS</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Electron/">Electron</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/">JavaScript</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Media/">Media</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/NetWork/">NetWork</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rust/">Rust</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Server/">Server</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/experience/">experience</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/self/">self</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E7%A8%8B%E5%8C%96/">工程化</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AF%BB%E4%B9%A6/">读书</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithm/" rel="tag">Algorithm</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/" rel="tag">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Electron/" rel="tag">Electron</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/FrontEnd/" rel="tag">FrontEnd</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/" rel="tag">HTTP</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP-Header/" rel="tag">HTTP Header</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NetWork/" rel="tag">NetWork</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/" rel="tag">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nodejs/" rel="tag">Nodejs</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Number/" rel="tag">Number</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Promise/" rel="tag">Promise</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rust/" rel="tag">Rust</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Server/" rel="tag">Server</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Serverless/" rel="tag">Serverless</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP-IP/" rel="tag">TCP&#x2F;IP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript/" rel="tag">TypeScript</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/" rel="tag">WebRTC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/animation/" rel="tag">animation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/audio/" rel="tag">audio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/browser/" rel="tag">browser</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clean-architecture/" rel="tag">clean architecture</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crypto/" rel="tag">crypto</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/functional-programing/" rel="tag">functional programing</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/interview/" rel="tag">interview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/" rel="tag">javascript</a><span class="tag-list-count">24</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs/" rel="tag">nodejs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regExp/" rel="tag">regExp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssr/" rel="tag">ssr</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/" rel="tag">video</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-vitals/" rel="tag">web-vitals</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/" rel="tag">webpack</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%91%E8%AE%A1%E7%AE%97/" rel="tag">云计算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" rel="tag">位运算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1/" rel="tag">服务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF/" rel="tag">桌面端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF%E8%BD%AF%E4%BB%B6/" rel="tag">桌面端软件</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" rel="tag">语言学习</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Algorithm/" style="font-size: 13.63px;">Algorithm</a> <a href="/tags/C/" style="font-size: 13px;">C++</a> <a href="/tags/Electron/" style="font-size: 13.75px;">Electron</a> <a href="/tags/FrontEnd/" style="font-size: 13px;">FrontEnd</a> <a href="/tags/HTTP/" style="font-size: 13.25px;">HTTP</a> <a href="/tags/HTTP-Header/" style="font-size: 13px;">HTTP Header</a> <a href="/tags/JavaScript/" style="font-size: 13.88px;">JavaScript</a> <a href="/tags/NetWork/" style="font-size: 13.38px;">NetWork</a> <a href="/tags/Nginx/" style="font-size: 13px;">Nginx</a> <a href="/tags/Nodejs/" style="font-size: 13.5px;">Nodejs</a> <a href="/tags/Number/" style="font-size: 13px;">Number</a> <a href="/tags/Promise/" style="font-size: 13.13px;">Promise</a> <a href="/tags/Rust/" style="font-size: 13.38px;">Rust</a> <a href="/tags/Server/" style="font-size: 13px;">Server</a> <a href="/tags/Serverless/" style="font-size: 13px;">Serverless</a> <a href="/tags/TCP-IP/" style="font-size: 13px;">TCP/IP</a> <a href="/tags/TypeScript/" style="font-size: 13.63px;">TypeScript</a> <a href="/tags/Web/" style="font-size: 13px;">Web</a> <a href="/tags/WebRTC/" style="font-size: 13.13px;">WebRTC</a> <a href="/tags/animation/" style="font-size: 13px;">animation</a> <a href="/tags/audio/" style="font-size: 13px;">audio</a> <a href="/tags/browser/" style="font-size: 13px;">browser</a> <a href="/tags/clean-architecture/" style="font-size: 13px;">clean architecture</a> <a href="/tags/crypto/" style="font-size: 13px;">crypto</a> <a href="/tags/css/" style="font-size: 13.13px;">css</a> <a href="/tags/functional-programing/" style="font-size: 13px;">functional programing</a> <a href="/tags/interview/" style="font-size: 13px;">interview</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/nodejs/" style="font-size: 13px;">nodejs</a> <a href="/tags/regExp/" style="font-size: 13px;">regExp</a> <a href="/tags/ssr/" style="font-size: 13px;">ssr</a> <a href="/tags/video/" style="font-size: 13px;">video</a> <a href="/tags/vue/" style="font-size: 13.75px;">vue</a> <a href="/tags/vue2/" style="font-size: 13px;">vue2</a> <a href="/tags/web-vitals/" style="font-size: 13px;">web-vitals</a> <a href="/tags/webpack/" style="font-size: 13.63px;">webpack</a> <a href="/tags/%E4%BA%91%E8%AE%A1%E7%AE%97/" style="font-size: 13px;">云计算</a> <a href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size: 13px;">位运算</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 13px;">前端</a> <a href="/tags/%E5%AE%89%E5%85%A8/" style="font-size: 13px;">安全</a> <a href="/tags/%E6%9C%8D%E5%8A%A1/" style="font-size: 13px;">服务</a> <a href="/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 13.63px;">架构</a> <a href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF/" style="font-size: 13px;">桌面端</a> <a href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF%E8%BD%AF%E4%BB%B6/" style="font-size: 13.63px;">桌面端软件</a> <a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 13.38px;">网络</a> <a href="/tags/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" style="font-size: 13.25px;">语言学习</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">七月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">九月 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AF%BB%E4%B9%A6/">读书</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/a8730dfb.html" class="title">架构整洁之道</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-10-29T16:00:00.000Z" itemprop="datePublished">2021-10-30</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/experience/">experience</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/673cef84.html" class="title">认识ProtocolBuffers</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-07-15T16:00:00.000Z" itemprop="datePublished">2021-07-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/experience/">experience</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/6f842db3.html" class="title">Crypto</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-06-19T16:00:00.000Z" itemprop="datePublished">2021-06-20</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/self/">self</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/33f3fd9d.html" class="title">字节跳动面试</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-06-04T16:00:00.000Z" itemprop="datePublished">2021-06-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/CSS/">CSS</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/d8bddba6.html" class="title">clear 清除浮动</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-05-30T16:00:00.000Z" itemprop="datePublished">2021-05-31</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF"><span class="toc-number">1.</span> <span class="toc-text">服务端</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Net%E6%A8%A1%E5%9D%97"><span class="toc-number">2.</span> <span class="toc-text">Net模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP%E6%A8%A1%E5%9D%97"><span class="toc-number">3.</span> <span class="toc-text">HTTP模块</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTPS%E6%A8%A1%E5%9D%97"><span class="toc-number">4.</span> <span class="toc-text">HTTPS模块</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%9F%E6%88%90%E7%A7%81%E9%92%A5%E5%92%8C%E8%AF%81%E4%B9%A6"><span class="toc-number">4.1.</span> <span class="toc-text">生成私钥和证书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#https%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8"><span class="toc-number">4.2.</span> <span class="toc-text">https模块使用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-x2F-2"><span class="toc-number">5.</span> <span class="toc-text">HTTP&#x2F;2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-x2F-2-%E7%89%B9%E7%82%B9"><span class="toc-number">5.1.</span> <span class="toc-text">HTTP&#x2F;2 特点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Nodejs%E5%AE%9E%E7%8E%B0"><span class="toc-number">5.2.</span> <span class="toc-text">Nodejs实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%8E%A8%E9%80%81-Server-Push"><span class="toc-number">5.3.</span> <span class="toc-text">服务端推送(Server Push)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="toc-number">5.4.</span> <span class="toc-text">客户端</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Express"><span class="toc-number">6.</span> <span class="toc-text">Express</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AD%E9%97%B4%E4%BB%B6%E2%80%94%E2%80%94%E6%B4%8B%E8%91%B1%E6%A8%A1%E5%9E%8B"><span class="toc-number">6.1.</span> <span class="toc-text">中间件——洋葱模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#https%E5%92%8Chttp2"><span class="toc-number">6.2.</span> <span class="toc-text">https和http2</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Koa"><span class="toc-number">7.</span> <span class="toc-text">Koa</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#https"><span class="toc-number">7.1.</span> <span class="toc-text">https</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#http-x2F-2"><span class="toc-number">7.2.</span> <span class="toc-text">http&#x2F;2</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP-x2F-3"><span class="toc-number">8.</span> <span class="toc-text">HTTP&#x2F;3</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Server/Nodejs搭建服务端" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Nodejs搭建服务端
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/posts/9e0c0ca5.html" class="article-date">
+	  <time datetime="2021-01-11T16:00:00.000Z" itemprop="datePublished">2021-01-12</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Server/">Server</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Nodejs/" rel="tag">Nodejs</a>, <a class="article-tag-link-link" href="/tags/%E6%9C%8D%E5%8A%A1/" rel="tag">服务</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/posts/9e0c0ca5.html#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h2><p>服务端顾名思义就是提供服务的一方。</p>
+<p>先回顾一下四层模型：<code>应用层（最顶层）</code>-&gt; <code>传输层</code> -&gt; <code>网络层</code> -&gt; <code>数据链路层（最底层）</code></p>
+<p>其中传输层使用的是<code>TCP/UDP</code>协议<br>应用层使用的协议有<code>http</code>、<code>ftp</code>等</p>
+<p>任何一种网络服务都必须遵从一种协议。</p>
+<p><code>nodejs</code>内置了若干模块，实现了常见的网络协议，并向用户提供了便利的接口。</p>
+<blockquote>
+<p>四层模型只是理论模型</p>
+</blockquote>
+<h2 id="Net模块"><a href="#Net模块" class="headerlink" title="Net模块"></a>Net模块</h2><p><a target="_blank" rel="noopener" href="https://nodejs.org/dist/latest-v14.x/docs/api/net.html"><code>net</code></a>模块在<a href="/posts/91c0fa71.html#%E6%90%AD%E5%BB%BA%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%E7%9A%84RPC%E9%80%9A%E9%81%93">认识RPC</a>中提到过，当时是用来搭建RPC通道。</p>
+<p>它可以建立基于流的TCP服务端和客户端。<br>简单的说，就是建立两端——服务端和客户端，两者之间通过TCP连接。数据以流的方式传输（<code>Buffer</code>）</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// server.ts</span></span><br><span class="line"><span class="keyword">import</span> &#123; createServer &#125; <span class="keyword">from</span> <span class="string">&quot;net&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createServer</span>(<span class="function">(<span class="params">socket</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  socket.<span class="title function_">on</span>(<span class="string">&quot;data&quot;</span>, <span class="function">(<span class="params">buffer</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;server: receive data from server: &quot;</span>, buffer.<span class="title function_">toString</span>());</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  socket.<span class="title function_">write</span>(<span class="string">&quot;hello client!&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">8081</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ---------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// client.ts</span></span><br><span class="line"><span class="keyword">import</span> &#123; createConnection &#125; <span class="keyword">from</span> <span class="string">&quot;net&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> socket = <span class="title function_">createConnection</span>(&#123;</span><br><span class="line">  <span class="attr">host</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">  <span class="attr">port</span>: <span class="number">8081</span>,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&quot;data&quot;</span>, <span class="function">(<span class="params">buffer</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;client: receive data from server: &quot;</span>, buffer.<span class="title function_">toString</span>());</span><br><span class="line"></span><br><span class="line">  socket.<span class="title function_">write</span>(<span class="string">&quot;hello server!&quot;</span>)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&quot;close&quot;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;client: close connection&quot;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>服务端通过<code>createServer</code>创建一个TCP服务，其回调函数接受<code>socket</code>作为参数。<br>客户端通过<code>createConnection</code>来连接服务端，其返回<code>socket</code></p>
+<p><code>sokect</code>是服务端和客户端用来通信的工具</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通过on来监听data事件</span></span><br><span class="line"><span class="comment">// 有消息发送过来 就会触发该事件</span></span><br><span class="line"><span class="comment">// 参数为buffer，使用toString toJSON等方法来获取原始值，参考nodejs buffer模块</span></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&quot;data&quot;</span>, <span class="function"><span class="params">buffer</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line">  <span class="comment">// buffer.toString()</span></span><br><span class="line">  <span class="comment">// buffer.toJSON()</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// socket.write(data[, encoding][, callback])</span></span><br><span class="line"><span class="comment">// write方法用来发送数据</span></span><br><span class="line">socket.<span class="title function_">write</span>(<span class="string">&quot;hello&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><code>buffer</code>的编解码可以使用<a target="_blank" rel="noopener" href="https://github.com/protocolbuffers/protobuf"><code>Protocol Buffers</code></a></p>
+<h2 id="HTTP模块"><a href="#HTTP模块" class="headerlink" title="HTTP模块"></a>HTTP模块</h2><p><a target="_blank" rel="noopener" href="https://nodejs.org/dist/latest-v14.x/docs/api/http.html"><code>http</code>模块</a>实现了<code>HTTP协议</code>。<code>HTTP协议</code>是基于<code>TCP协议</code>的，所以<code>nodejs</code>的<code>http</code>模块是基于<code>net</code>模块的。</p>
+<p>传统的web网站主要使用的就是http协议</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createServer &#125; <span class="keyword">from</span> <span class="string">&quot;http&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; readFileSync &#125; <span class="keyword">from</span> <span class="string">&quot;fs&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> buffer = <span class="title function_">readFileSync</span>(<span class="string">&quot;./index.html&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createServer</span>(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.<span class="title function_">end</span>(buffer);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="string">&quot;8080&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>在浏览器输入<code>localhost:8080</code>就可以访问<code>index.html</code>。一个极简的http服务就搭建成了。</p>
+<p><code>http</code>模块也提供了客户端方法——<code>request</code></p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; request &#125; <span class="keyword">from</span> <span class="string">&#x27;http&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> postData = querystring.<span class="title function_">stringify</span>(&#123;</span><br><span class="line">  <span class="string">&#x27;msg&#x27;</span>: <span class="string">&#x27;Hello World!&#x27;</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">hostname</span>: <span class="string">&#x27;www.google.com&#x27;</span>,</span><br><span class="line">  <span class="attr">port</span>: <span class="number">80</span>,</span><br><span class="line">  <span class="attr">path</span>: <span class="string">&#x27;/upload&#x27;</span>,</span><br><span class="line">  <span class="attr">method</span>: <span class="string">&#x27;POST&#x27;</span>,</span><br><span class="line">  <span class="attr">headers</span>: &#123;</span><br><span class="line">    <span class="string">&#x27;Content-Type&#x27;</span>: <span class="string">&#x27;application/x-www-form-urlencoded&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;Content-Length&#x27;</span>: <span class="title class_">Buffer</span>.<span class="title function_">byteLength</span>(postData)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> req = http.<span class="title function_">request</span>(options, <span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`STATUS: <span class="subst">$&#123;res.statusCode&#125;</span>`</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`HEADERS: <span class="subst">$&#123;<span class="built_in">JSON</span>.stringify(res.headers)&#125;</span>`</span>);</span><br><span class="line">  res.<span class="title function_">setEncoding</span>(<span class="string">&#x27;utf8&#x27;</span>);</span><br><span class="line">  res.<span class="title function_">on</span>(<span class="string">&#x27;data&#x27;</span>, <span class="function">(<span class="params">chunk</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`BODY: <span class="subst">$&#123;chunk&#125;</span>`</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">  res.<span class="title function_">on</span>(<span class="string">&#x27;end&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;No more data in response.&#x27;</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">req.<span class="title function_">on</span>(<span class="string">&#x27;error&#x27;</span>, <span class="function">(<span class="params">e</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">`problem with request: <span class="subst">$&#123;e.message&#125;</span>`</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Write data to request body</span></span><br><span class="line">req.<span class="title function_">write</span>(postData);</span><br><span class="line">req.<span class="title function_">end</span>();</span><br></pre></td></tr></table></figure>
+
+<h2 id="HTTPS模块"><a href="#HTTPS模块" class="headerlink" title="HTTPS模块"></a>HTTPS模块</h2><p>在<code>HTTP</code>和<code>TCP</code>之间有加了一层<code>TLS/SSL</code>，以解决明文传输的安全问题</p>
+<p><code>HTTPS</code>在<code>HTTP</code>基础上添加了<code>TLS/SSL</code>加密功能。在<code>nodejs</code>中<code>TLS/SSL</code>也是一个独立的模块。<code>HTTPS</code>模块基于<code>HTTP</code>模块和<code>TLS/SSL</code>模块。</p>
+<p>对于开发者，使用<code>HTTPS</code>就是多了一步——<strong>配置私钥和证书</strong>。</p>
+<h3 id="生成私钥和证书"><a href="#生成私钥和证书" class="headerlink" title="生成私钥和证书"></a>生成私钥和证书</h3><p>首选确认正确安装<code>openssl</code>。将通过命令行来生成私钥和证书</p>
+<p>第一步，生成私钥key , <code>ryans-key.pem</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out ryans-key.pem 2048</span><br></pre></td></tr></table></figure>
+
+<p>第二步，根据私钥，生成证书注册请求（Certificate Signing Request， CSR）, <code>ryans-csr.pem</code>，会提问一堆问题（密码记住）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl req -new -sha256 -key ryans-key.pem -out ryans-csr.pem</span><br></pre></td></tr></table></figure>
+
+<p>第三步，把CSR发给CA机构签名，我们这一步采用自签名的方式，获得证书<code>ryans-cert.pem</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl x509 -req -<span class="keyword">in</span> ryans-csr.pem -signkey ryans-key.pem -out ryans-cert.pem</span><br></pre></td></tr></table></figure>
+
+<p>至此，我们获得了私钥和<code>cer证书</code>。</p>
+<p>我们还可以进一步获取<code>pfx证书</code>,<code>ryans.pfx</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl pkcs12 -<span class="built_in">export</span> -<span class="keyword">in</span> ryans-cert.pem -inkey ryans-key.pem -out ryans.pfx</span><br></pre></td></tr></table></figure>
+
+<h3 id="https模块使用"><a href="#https模块使用" class="headerlink" title="https模块使用"></a>https模块使用</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createServer &#125; <span class="keyword">from</span> <span class="string">&quot;https&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; fstat, readFileSync &#125; <span class="keyword">from</span> <span class="string">&quot;fs&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">key</span>: <span class="title function_">readFileSync</span>(<span class="string">&quot;./certs/ryans-key.pem&quot;</span>),</span><br><span class="line">  <span class="attr">cert</span>: <span class="title function_">readFileSync</span>(<span class="string">&quot;./certs/ryans-cert.pem&quot;</span>),</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> html = <span class="title function_">readFileSync</span>(<span class="string">&#x27;../index.html&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createServer</span>(options, <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.<span class="title function_">end</span>(html)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">443</span>) <span class="comment">// https默认是443端口</span></span><br></pre></td></tr></table></figure>
+
+<p>使用Chrome来测试，首先需要允许<code>localhost</code>使用无效证书（没有经过CA签名）。<code>chrome://flags/#allow-insecure-localhost</code>，设为<code>Enabled</code>即可</p>
+<p>在浏览器中输入<code>https://localhost:443</code>。就可以看到页面了</p>
+<p>还可以使用pfx证书，pfx证书相对于cer证书：</p>
+<ul>
+<li>cer证书只包含公钥</li>
+<li>pfx证书包含公钥和私钥</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createServer &#125; <span class="keyword">from</span> <span class="string">&quot;https&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; fstat, readFileSync &#125; <span class="keyword">from</span> <span class="string">&quot;fs&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">pfx</span>: <span class="title function_">readFileSync</span>(<span class="string">&#x27;./certs/ryans.pfx&#x27;</span>),</span><br><span class="line">  <span class="attr">passphrase</span>: <span class="string">&#x27;&#x27;</span> <span class="comment">// pfx证书的密码</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> html = <span class="title function_">readFileSync</span>(<span class="string">&#x27;../index.html&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createServer</span>(options, <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  res.<span class="title function_">end</span>(html)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">443</span>)</span><br></pre></td></tr></table></figure>
+
+<p><code>https</code>模块也有<code>https.request</code>方法用来发起https请求</p>
+<h2 id="HTTP-x2F-2"><a href="#HTTP-x2F-2" class="headerlink" title="HTTP&#x2F;2"></a>HTTP&#x2F;2</h2><h3 id="HTTP-x2F-2-特点"><a href="#HTTP-x2F-2-特点" class="headerlink" title="HTTP&#x2F;2 特点"></a>HTTP&#x2F;2 特点</h3><p><code>http</code>通常指<code>http/1.1</code>。<code>http/2</code>相较于<code>http/1.1</code>做了很多提升:</p>
+<ul>
+<li><strong><code>TLS/SSL</code>加密</strong>：和https一样。所以也需要配置证书和私钥</li>
+<li><strong>二进制传输</strong>：<code>http/1.1</code>传输的是文本，<code>http/2</code>传输的是二进制流</li>
+<li><strong>多路复用</strong>：<code>http/2</code>有两个概念——<strong>帧</strong>和<strong>流</strong>。<code>http/2</code>将数据报文分成一个个二进制<strong>帧（Frame）</strong>，在一个TCP连接中，不同的帧组合在一起发送（<strong>二进制分帧</strong>）形成<strong>流（Stream）</strong>。在接收方根据帧首部信息在组合起来。<code>HTTP/1.1</code>只能一个个请求报文排队发送。</li>
+<li><strong>header压缩</strong>：http请求有这繁多冗长的首部，<code>http/2</code>会对首部进行压缩</li>
+<li><strong>服务端推送</strong>：能够主动给客户端推送资源<ul>
+<li><code>http/1.1</code>加载网页的顺序：请求html，解析html，再请求js、css等文件</li>
+<li><code>http/2</code>：当服务端收到html请求时，服务端就主动吧html、css、js以及图片等资源发送给客户端</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>前4个都是<code>http/2</code>自动实现的。服务端推送需要开发者手动配置。</p>
+</blockquote>
+<h3 id="Nodejs实现"><a href="#Nodejs实现" class="headerlink" title="Nodejs实现"></a>Nodejs实现</h3><p><code>nodejs</code>内置了<code>http2</code>模块，实现了<code>http/2</code>协议。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createSecureServer &#125; <span class="keyword">from</span> <span class="string">&quot;http2&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; readFileSync &#125; <span class="keyword">from</span> <span class="string">&quot;fs&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">pfx</span>: <span class="title function_">readFileSync</span>(<span class="string">&quot;./certs/ryans.pfx&quot;</span>),</span><br><span class="line">  <span class="attr">passphrase</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> html = <span class="title function_">readFileSync</span>(<span class="string">&quot;../index.html&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createSecureServer</span>(options);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">on</span>(<span class="string">&quot;stream&quot;</span>, <span class="function">(<span class="params">stream, headers</span>) =&gt;</span> &#123;</span><br><span class="line">  stream.<span class="title function_">respond</span>(&#123;</span><br><span class="line">    <span class="string">&quot;content-type&quot;</span>: <span class="string">&quot;text/html; charset=utf-8&quot;</span>,</span><br><span class="line">    <span class="string">&quot;:status&quot;</span>: <span class="number">200</span>,</span><br><span class="line">  &#125;);</span><br><span class="line">  stream.<span class="title function_">end</span>(html);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">443</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>http2</code>模块有两个创建服务的方法——<code>createServer</code>和<code>createSecureServer</code>。前者是不带TLS&#x2F;SSL加密的，后者带加密。目前主流浏览器只支持带<code>TLS/SSL</code>加密的<code>HTTP/2</code></p>
+<p>监听<code>http2Server</code>的<code>stream</code>事件，当请求发来就来触发该事件（http2数据是以二进制流的形式传输）</p>
+<p><code>http2Stream</code>是一个双工流。既可以发送数据也可以接受数据。<code>ServerHttp2Stream</code>是其实现，其：</p>
+<ul>
+<li><code>http2stream.pushStream(headers[, options], callback)</code>：实现服务端主动推送</li>
+<li><code>http2stream.respond([headers[, options]])</code>：发送回应，可以在这设置响应头</li>
+<li><code>stream</code>是一个流，使用<code>stream.write()</code>向其写入内容或<code>stream.end(content)</code>结束这个流</li>
+</ul>
+<h3 id="服务端推送-Server-Push"><a href="#服务端推送-Server-Push" class="headerlink" title="服务端推送(Server Push)"></a>服务端推送(Server Push)</h3><p>这是http&#x2F;2的一大特点。nodejs中实现通过<code>pushStream</code>方法即可实现</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; createSecureServer &#125; <span class="keyword">from</span> <span class="string">&quot;http2&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; readFileSync &#125; <span class="keyword">from</span> <span class="string">&quot;fs&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">pfx</span>: <span class="title function_">readFileSync</span>(<span class="string">&quot;./certs/ryans.pfx&quot;</span>),</span><br><span class="line">  <span class="attr">passphrase</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> html = <span class="title function_">readFileSync</span>(<span class="string">&quot;../index.html&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> png = <span class="title function_">readFileSync</span>(<span class="string">&quot;../hello.jpg&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createSecureServer</span>(options);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">on</span>(<span class="string">&quot;stream&quot;</span>, <span class="function">(<span class="params">stream, headers</span>) =&gt;</span> &#123;</span><br><span class="line">  stream.<span class="title function_">respond</span>(&#123;</span><br><span class="line">    <span class="string">&quot;content-type&quot;</span>: <span class="string">&quot;text/html; charset=utf-8&quot;</span>,</span><br><span class="line">    <span class="string">&quot;:status&quot;</span>: <span class="number">200</span>,</span><br><span class="line">  &#125;);</span><br><span class="line">  stream.<span class="title function_">pushStream</span>(&#123; <span class="string">&quot;:path&quot;</span>: <span class="string">&quot;/hello.jpg&quot;</span> &#125;, <span class="function">(<span class="params">err, pushStream, headers</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (err) <span class="keyword">throw</span> err;</span><br><span class="line">    pushStream.<span class="title function_">respond</span>(&#123; <span class="string">&quot;:status&quot;</span>: <span class="number">200</span> &#125;);</span><br><span class="line">    pushStream.<span class="title function_">end</span>(png);</span><br><span class="line">  &#125;);</span><br><span class="line">  stream.<span class="title function_">end</span>(html);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">443</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>上例在用户请求<code>https://localhost</code>时，将index.html和<code>https://localhost/hello.jpg</code>一起发送给客户端。</p>
+<h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><p><code>http2</code>模块也提供了客户端实现。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; connect &#125; <span class="keyword">from</span> <span class="string">&quot;http2&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; readFileSync &#125; <span class="keyword">from</span> <span class="string">&quot;fs&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> client = <span class="title function_">connect</span>(<span class="string">&quot;https://www.zxffan.com:443&quot;</span>, &#123;</span><br><span class="line">  <span class="attr">ca</span>: <span class="title function_">readFileSync</span>(<span class="string">&quot;./certs/ryans-cert.pem&quot;</span>),</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> req = client.<span class="title function_">request</span>(&#123; <span class="string">&quot;:path&quot;</span>: <span class="string">&quot;/&quot;</span> &#125;);</span><br><span class="line"></span><br><span class="line">req.<span class="title function_">on</span>(<span class="string">&quot;response&quot;</span>, <span class="function">(<span class="params">headers, flags</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> name <span class="keyword">in</span> headers) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;name&#125;</span>: <span class="subst">$&#123;headers[name]&#125;</span>`</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">req.<span class="title function_">setEncoding</span>(<span class="string">&quot;utf8&quot;</span>);</span><br><span class="line"><span class="keyword">let</span> data = <span class="string">&quot;&quot;</span>;</span><br><span class="line">req.<span class="title function_">on</span>(<span class="string">&quot;data&quot;</span>, <span class="function">(<span class="params">chunk</span>) =&gt;</span> &#123;</span><br><span class="line">  data += chunk;</span><br><span class="line">&#125;);</span><br><span class="line">req.<span class="title function_">on</span>(<span class="string">&quot;end&quot;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`\n<span class="subst">$&#123;data&#125;</span>`</span>);</span><br><span class="line">  client.<span class="title function_">close</span>();</span><br><span class="line">&#125;);</span><br><span class="line">req.<span class="title function_">end</span>();</span><br></pre></td></tr></table></figure>
+
+<p>客户端需要配置ca证书</p>
+<h2 id="Express"><a href="#Express" class="headerlink" title="Express"></a>Express</h2><p><code>Express</code>是<code>ndoejs</code>的第三方库，它对网络模块做了增强。来个例子：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> express <span class="keyword">from</span> <span class="string">&quot;express&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; createServer &#125; <span class="keyword">from</span> <span class="string">&#x27;http&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="title function_">express</span>();</span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createServer</span>(app)</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">get</span>(<span class="string">&quot;/&quot;</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line">  res.<span class="title function_">send</span>(<span class="string">&#x27;hello express!&#x27;</span>)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(<span class="function">(<span class="params">req, res, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Time: %d&#x27;</span>, <span class="title class_">Date</span>.<span class="title function_">now</span>())</span><br><span class="line">  <span class="title function_">next</span>()</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>将app传给<code>createServer</code>。这样<code>express</code>就拦截了所有请求，在收到请求到响应之间就可以添加很多<strong>中间件</strong>。</p>
+<ul>
+<li><p>中间件系统，<code>app.use</code>来注册一个中间件，所有请求回按照中间件注册顺序依次调用。</p>
+</li>
+<li><p>路由系统，<code>express</code>新增了路由，<code>app.get</code>、<code>app.post</code>。路由本质上也是中间件</p>
+</li>
+</ul>
+<h3 id="中间件——洋葱模型"><a href="#中间件——洋葱模型" class="headerlink" title="中间件——洋葱模型"></a>中间件——洋葱模型</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> express <span class="keyword">from</span> <span class="string">&quot;express&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; createServer &#125; <span class="keyword">from</span> <span class="string">&quot;http&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="title function_">express</span>();</span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createServer</span>(app);</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(</span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">m1</span>(<span class="params">req, res, next</span>)  &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;m1 start&#x27;</span>);</span><br><span class="line">    <span class="title function_">next</span>()</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;m1 end&#x27;</span>)</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">m2</span>(<span class="params">req, res, next</span>)  &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;m2 start&#x27;</span>);</span><br><span class="line">    <span class="title function_">next</span>()</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;m2 end&#x27;</span>)</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">m3</span>(<span class="params">req, res, next</span>)  &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;m3 start&#x27;</span>);</span><br><span class="line">    <span class="title function_">next</span>()</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;m3 end&#x27;</span>)</span><br><span class="line">  &#125;,</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">get</span>(<span class="string">&quot;/&quot;</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line">  res.<span class="title function_">send</span>(<span class="string">&quot;hello express!&quot;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>上例注册了3个中间件——<code>m1</code>,<code>m2</code>和<code>m3</code></p>
+<p>输出顺序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">m1 start</span><br><span class="line">m2 start</span><br><span class="line">m3 start</span><br><span class="line">m3 end</span><br><span class="line">m2 end</span><br><span class="line">m1 end</span><br></pre></td></tr></table></figure>
+
+<p>中间件就像一个洋葱，<code>m1</code>是外表皮，<code>m2</code>是中间表皮，<code>m2</code>是内表皮。从洋葱的一层穿透到另一个，经过顺序必然是：<code>m1-&gt;m2-&gt;m3-&gt;m3-&gt;m2-&gt;m1</code>。、</p>
+<p><img src="/../../images/nodejs/%E4%B8%AD%E9%97%B4%E4%BB%B6%E6%B4%8B%E8%91%B1%E6%A8%A1%E5%9E%8B.png" alt="洋葱模型"></p>
+<p>但是<code>express</code>的洋葱模型又个问题——异步支持不好。如果m2中进行一个异步操作（RPC，查数据库等），其它中间件不会等待操作结果。<code>Koa</code>的出现弥补了这个缺点。</p>
+<h3 id="https和http2"><a href="#https和http2" class="headerlink" title="https和http2"></a>https和http2</h3><p>https</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> express <span class="keyword">from</span> <span class="string">&quot;express&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; createServer &#125; <span class="keyword">from</span> <span class="string">&quot;https&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; readFileSync &#125; <span class="keyword">from</span> <span class="string">&quot;fs&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">pfx</span>: <span class="title function_">readFileSync</span>(<span class="string">&quot;./certs/ryans.pfx&quot;</span>),</span><br><span class="line">  <span class="attr">passphrase</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="title function_">express</span>();</span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createServer</span>(options, app);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> html = <span class="title function_">readFileSync</span>(<span class="string">&quot;../index.html&quot;</span>, <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">get</span>(<span class="string">&quot;/&quot;</span>, <span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line">  res.<span class="title function_">send</span>(html);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>使用方法和<code>http</code>模块类似。</p>
+<p>至于<code>http2</code>模块，<code>express</code>目前还无法与其兼容。参见官方<a target="_blank" rel="noopener" href="https://github.com/expressjs/express/issues/2761#issuecomment-142610897">issue</a><br>如果想在<code>http2</code>模块中使用<code>express</code>的路由，可以使用<a target="_blank" rel="noopener" href="https://github.com/pillarjs/router"><code>router</code></a>，它是从express独立出来的并且兼容<code>http2</code>，参考<a target="_blank" rel="noopener" href="https://github.com/expressjs/express/issues/2761#issuecomment-142612001">issue</a><br>搜索资料，发现可以使用<code>spdy</code>这个库来结合express实现<code>http2</code></p>
+<h2 id="Koa"><a href="#Koa" class="headerlink" title="Koa"></a>Koa</h2><p><code>Koa</code>是<code>express</code>原班人马打造的。<code>koa</code>就是一个<strong>中间件系统</strong>。他的中间件支持两种函数——普通函数和<strong>异步函数</strong></p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Koa</span> <span class="keyword">from</span> <span class="string">&quot;koa&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; createServer &#125; <span class="keyword">from</span> <span class="string">&quot;http&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> <span class="title class_">Koa</span>();</span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createServer</span>(app.<span class="title function_">callback</span>());</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">next</span>();</span><br><span class="line">  ctx.<span class="property">body</span> = <span class="string">&#x27;hello koa!&#x27;</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>我这里的写法都是通过原生<code>http</code>模块，这是为了体现<code>koa</code>、<code>express</code>只不过是一套中间件层。底层的网络服务还是nodejs提供的。</p>
+<p>也可以简写</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Koa</span> <span class="keyword">from</span> <span class="string">&quot;koa&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> <span class="title class_">Koa</span>();</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">next</span>();</span><br><span class="line">  ctx.<span class="property">body</span> = <span class="string">&#x27;hello koa!&#x27;</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">listen</span>(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure>
+
+<p>koa中间件支持nodejs的<code>async</code>和<code>await</code>语法，从而优雅的实现异步。</p>
+<h3 id="https"><a href="#https" class="headerlink" title="https"></a>https</h3><p>使用https，也就是更换底层网络协议。</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Koa</span> <span class="keyword">from</span> <span class="string">&quot;koa&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; createServer &#125; <span class="keyword">from</span> <span class="string">&quot;https&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; readFileSync &#125; <span class="keyword">from</span> <span class="string">&quot;fs&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">pfx</span>: <span class="title function_">readFileSync</span>(<span class="string">&quot;./certs/ryans.pfx&quot;</span>),</span><br><span class="line">  <span class="attr">passphrase</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> <span class="title class_">Koa</span>();</span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createServer</span>(options, app.<span class="title function_">callback</span>());</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> html = <span class="title function_">readFileSync</span>(<span class="string">&quot;../index.html&quot;</span>, <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">next</span>();</span><br><span class="line">  ctx.<span class="property">body</span> = html;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">3000</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="http-x2F-2"><a href="#http-x2F-2" class="headerlink" title="http&#x2F;2"></a>http&#x2F;2</h3><p><code>Koa</code>是兼容<code>http2</code>模块的：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="title class_">Koa</span> <span class="keyword">from</span> <span class="string">&quot;koa&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; createSecureServer &#125; <span class="keyword">from</span> <span class="string">&quot;http2&quot;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; readFileSync &#125; <span class="keyword">from</span> <span class="string">&quot;fs&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">pfx</span>: <span class="title function_">readFileSync</span>(<span class="string">&quot;./certs/ryans.pfx&quot;</span>),</span><br><span class="line">  <span class="attr">passphrase</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> html = <span class="title function_">readFileSync</span>(<span class="string">&quot;../index.html&quot;</span>, <span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> app = <span class="keyword">new</span> <span class="title class_">Koa</span>();</span><br><span class="line"><span class="keyword">const</span> server = <span class="title function_">createSecureServer</span>(options, app.<span class="title function_">callback</span>());</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(<span class="keyword">async</span> (ctx, next) =&gt; &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="title function_">next</span>();</span><br><span class="line">  ctx.</span><br><span class="line">  ctx.<span class="property">body</span> = html;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">443</span>);</span><br></pre></td></tr></table></figure>
+
+<p>koa如何使用服务端推送，目前还没有查到😂。</p>
+<p>查了下官方issue，开发者只提到兼容HTTP&#x2F;2。没提<code>server push</code>，不过有人建议通过<code>ctx.stream</code>的形式获得流，进而使用<code>stream.pushStream()</code></p>
+<h2 id="HTTP-x2F-3"><a href="#HTTP-x2F-3" class="headerlink" title="HTTP&#x2F;3"></a>HTTP&#x2F;3</h2><p><code>HTTP/1.x</code>、<code>HTTPS</code>以及<code>HTTP/2.0</code>都离不开底层的<code>TCP</code>协议。</p>
+<p><code>HTTP/2.0</code>采用多路复用，多个数据包使用一个<code>TCP</code>连接。<code>TCP</code>是可靠连接，但发生丢包时，会进行重传。所以网络状态差的情况下，某些数据包频繁重传，从而导致拥塞，后面的HTTP包都穿不出去。这叫做<strong>头部阻塞（Head of line Blocking）</strong></p>
+<p><code>HTTP/3.0</code>就开始考虑放弃<code>TCP</code>转向<code>UDP</code>协议。起初<code>Google</code>搞出来个<code>QUIC</code>协议，后来<code>IETF</code>标准化了<code>QUIC</code>协议形成<code>HTTP/3</code>。其底层采用<code>UDP</code>，基于<code>UDP</code>实现做了众多增强：</p>
+<ul>
+<li>0RTT：<code>TPC</code>建立连接每次都需要三次握手，就存在数据包的三次往返即<strong>3RTT</strong>。而<code>QUIC</code>首次建立连接只需要<code>1RTT</code>。其后的连接可以直接复用，只需要<strong>0RTT</strong></li>
+<li>连接迁移：当<code>源IP</code>、<code>源端口</code>、<code>目的IP</code>、<code>目的端口</code>其中一个发生变化就需要重新建立TCP连接。只要<strong>Connection ID</strong>没有变化。<code>HTTP/3</code>可以继续复用连接</li>
+<li>头部阻塞：由于使用<code>UDP</code>，发生丢包时，也不会立即重传，阻塞连接。</li>
+<li>拥塞控制</li>
+<li>前向纠错</li>
+<li>更多特性 请参考<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/143464334">文章</a></li>
+</ul>
+<p>nodejs目前未支持<code>HTTP/3</code>。</p>
+<p>chrome只支持 <code>Google QUIC</code>。对<code>IETF QUIC</code>的支持处于<code>WIP</code>状态</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://zxffan.github.io/posts/9e0c0ca5.html" title="Nodejs搭建服务端" target="_blank" rel="external">https://zxffan.github.io/posts/9e0c0ca5.html</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/fzxen" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpeg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/fzxen" target="_blank"><span class="text-dark">fzxen</span><small class="ml-1x">Web Developer &amp; Designer</small></a></h3>
+        <div>web developer</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/posts/af3ae610.html" title="Nodejs搭建vue服务端渲染"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/posts/d0156050.html" title="Nginx"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/fzxen" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/zxffan" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

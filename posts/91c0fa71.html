@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>认识RPC | Hexo</title>
+  <meta name="description" content="RPC初识RPC（Remote Procedure Call）即远程过程调用。与Ajax类似。主要用于不同端之间的通信。 和Ajax的异同之处：  都是计算机之间网络通信的方式 Ajax是浏览器与服务端之间的通信方式 RPC是服务端之间的通信方式   都需要双方约定一个数据格式 Ajax约定格式为json RPC通常使用二进制   寻址方式 Ajax使用DNS进行寻址 RPC也需要寻址，可能根据I">
+<meta property="og:type" content="article">
+<meta property="og:title" content="认识RPC">
+<meta property="og:url" content="https://zxffan.github.io/posts/91c0fa71.html">
+<meta property="og:site_name" content="zxfan">
+<meta property="og:description" content="RPC初识RPC（Remote Procedure Call）即远程过程调用。与Ajax类似。主要用于不同端之间的通信。 和Ajax的异同之处：  都是计算机之间网络通信的方式 Ajax是浏览器与服务端之间的通信方式 RPC是服务端之间的通信方式   都需要双方约定一个数据格式 Ajax约定格式为json RPC通常使用二进制   寻址方式 Ajax使用DNS进行寻址 RPC也需要寻址，可能根据I">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zxffan.github.io/images/%E5%8D%95%E5%8F%8C%E5%B7%A5.png">
+<meta property="og:image" content="https://zxffan.github.io/images/%E5%85%A8%E5%8F%8C%E5%B7%A5.png">
+<meta property="og:image" content="https://zxffan.github.io/images/%E5%85%A8%E5%8F%8C%E5%B7%A5%E6%95%B0%E6%8D%AE%E6%8A%A5%E6%96%87.png">
+<meta property="article:published_time" content="2020-10-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-30T11:14:18.595Z">
+<meta property="article:author" content="zxfan">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="Nodejs">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zxffan.github.io/images/%E5%8D%95%E5%8F%8C%E5%B7%A5.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://zxffan.github.io/posts/91c0fa71.html">
+  
+    <link rel="alternate" href="/atom.xml" title="zxfan" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/fzxen" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpeg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">fzxen</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Web Developer &amp; Designer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Beijing, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/fzxen" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/zxffan" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/CSS/">CSS</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Electron/">Electron</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JavaScript/">JavaScript</a><span class="category-list-count">10</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Media/">Media</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/NetWork/">NetWork</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Rust/">Rust</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Server/">Server</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/experience/">experience</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/self/">self</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B7%A5%E7%A8%8B%E5%8C%96/">工程化</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%BA%90%E7%A0%81/">源码</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%AF%BB%E4%B9%A6/">读书</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Algorithm/" rel="tag">Algorithm</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/C/" rel="tag">C++</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Electron/" rel="tag">Electron</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/FrontEnd/" rel="tag">FrontEnd</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/" rel="tag">HTTP</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP-Header/" rel="tag">HTTP Header</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JavaScript/" rel="tag">JavaScript</a><span class="tag-list-count">10</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NetWork/" rel="tag">NetWork</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/" rel="tag">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nodejs/" rel="tag">Nodejs</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Number/" rel="tag">Number</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Promise/" rel="tag">Promise</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Rust/" rel="tag">Rust</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Server/" rel="tag">Server</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Serverless/" rel="tag">Serverless</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP-IP/" rel="tag">TCP&#x2F;IP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TypeScript/" rel="tag">TypeScript</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/" rel="tag">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebRTC/" rel="tag">WebRTC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/animation/" rel="tag">animation</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/audio/" rel="tag">audio</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/browser/" rel="tag">browser</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/clean-architecture/" rel="tag">clean architecture</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/crypto/" rel="tag">crypto</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/functional-programing/" rel="tag">functional programing</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/interview/" rel="tag">interview</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/" rel="tag">javascript</a><span class="tag-list-count">24</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs/" rel="tag">nodejs</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/regExp/" rel="tag">regExp</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssr/" rel="tag">ssr</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/video/" rel="tag">video</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/" rel="tag">vue</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue2/" rel="tag">vue2</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web-vitals/" rel="tag">web-vitals</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/webpack/" rel="tag">webpack</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BA%91%E8%AE%A1%E7%AE%97/" rel="tag">云计算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" rel="tag">位运算</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%89%8D%E7%AB%AF/" rel="tag">前端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9C%8D%E5%8A%A1/" rel="tag">服务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag">架构</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF/" rel="tag">桌面端</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF%E8%BD%AF%E4%BB%B6/" rel="tag">桌面端软件</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" rel="tag">语言学习</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Algorithm/" style="font-size: 13.63px;">Algorithm</a> <a href="/tags/C/" style="font-size: 13px;">C++</a> <a href="/tags/Electron/" style="font-size: 13.75px;">Electron</a> <a href="/tags/FrontEnd/" style="font-size: 13px;">FrontEnd</a> <a href="/tags/HTTP/" style="font-size: 13.25px;">HTTP</a> <a href="/tags/HTTP-Header/" style="font-size: 13px;">HTTP Header</a> <a href="/tags/JavaScript/" style="font-size: 13.88px;">JavaScript</a> <a href="/tags/NetWork/" style="font-size: 13.38px;">NetWork</a> <a href="/tags/Nginx/" style="font-size: 13px;">Nginx</a> <a href="/tags/Nodejs/" style="font-size: 13.5px;">Nodejs</a> <a href="/tags/Number/" style="font-size: 13px;">Number</a> <a href="/tags/Promise/" style="font-size: 13.13px;">Promise</a> <a href="/tags/Rust/" style="font-size: 13.38px;">Rust</a> <a href="/tags/Server/" style="font-size: 13px;">Server</a> <a href="/tags/Serverless/" style="font-size: 13px;">Serverless</a> <a href="/tags/TCP-IP/" style="font-size: 13px;">TCP/IP</a> <a href="/tags/TypeScript/" style="font-size: 13.63px;">TypeScript</a> <a href="/tags/Web/" style="font-size: 13px;">Web</a> <a href="/tags/WebRTC/" style="font-size: 13.13px;">WebRTC</a> <a href="/tags/animation/" style="font-size: 13px;">animation</a> <a href="/tags/audio/" style="font-size: 13px;">audio</a> <a href="/tags/browser/" style="font-size: 13px;">browser</a> <a href="/tags/clean-architecture/" style="font-size: 13px;">clean architecture</a> <a href="/tags/crypto/" style="font-size: 13px;">crypto</a> <a href="/tags/css/" style="font-size: 13.13px;">css</a> <a href="/tags/functional-programing/" style="font-size: 13px;">functional programing</a> <a href="/tags/interview/" style="font-size: 13px;">interview</a> <a href="/tags/javascript/" style="font-size: 14px;">javascript</a> <a href="/tags/nodejs/" style="font-size: 13px;">nodejs</a> <a href="/tags/regExp/" style="font-size: 13px;">regExp</a> <a href="/tags/ssr/" style="font-size: 13px;">ssr</a> <a href="/tags/video/" style="font-size: 13px;">video</a> <a href="/tags/vue/" style="font-size: 13.75px;">vue</a> <a href="/tags/vue2/" style="font-size: 13px;">vue2</a> <a href="/tags/web-vitals/" style="font-size: 13px;">web-vitals</a> <a href="/tags/webpack/" style="font-size: 13.63px;">webpack</a> <a href="/tags/%E4%BA%91%E8%AE%A1%E7%AE%97/" style="font-size: 13px;">云计算</a> <a href="/tags/%E4%BD%8D%E8%BF%90%E7%AE%97/" style="font-size: 13px;">位运算</a> <a href="/tags/%E5%89%8D%E7%AB%AF/" style="font-size: 13px;">前端</a> <a href="/tags/%E5%AE%89%E5%85%A8/" style="font-size: 13px;">安全</a> <a href="/tags/%E6%9C%8D%E5%8A%A1/" style="font-size: 13px;">服务</a> <a href="/tags/%E6%9E%B6%E6%9E%84/" style="font-size: 13.63px;">架构</a> <a href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF/" style="font-size: 13px;">桌面端</a> <a href="/tags/%E6%A1%8C%E9%9D%A2%E7%AB%AF%E8%BD%AF%E4%BB%B6/" style="font-size: 13.63px;">桌面端软件</a> <a href="/tags/%E7%BD%91%E7%BB%9C/" style="font-size: 13.38px;">网络</a> <a href="/tags/%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0/" style="font-size: 13.25px;">语言学习</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">七月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/05/">五月 2021</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/04/">四月 2021</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">十二月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">九月 2020</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E8%AF%BB%E4%B9%A6/">读书</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/a8730dfb.html" class="title">架构整洁之道</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-10-29T16:00:00.000Z" itemprop="datePublished">2021-10-30</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/experience/">experience</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/673cef84.html" class="title">认识ProtocolBuffers</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-07-15T16:00:00.000Z" itemprop="datePublished">2021-07-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/experience/">experience</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/6f842db3.html" class="title">Crypto</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-06-19T16:00:00.000Z" itemprop="datePublished">2021-06-20</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/self/">self</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/33f3fd9d.html" class="title">字节跳动面试</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-06-04T16:00:00.000Z" itemprop="datePublished">2021-06-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/CSS/">CSS</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/d8bddba6.html" class="title">clear 清除浮动</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-05-30T16:00:00.000Z" itemprop="datePublished">2021-05-31</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RPC%E5%88%9D%E8%AF%86"><span class="toc-number">1.</span> <span class="toc-text">RPC初识</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%BC%96%E8%A7%A3%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">二进制编解码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Buffer"><span class="toc-number">2.1.</span> <span class="toc-text">Buffer</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%9B%E5%BB%BABuffer"><span class="toc-number">2.1.1.</span> <span class="toc-text">创建Buffer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AF%BB%E5%86%99Buffer"><span class="toc-number">2.1.2.</span> <span class="toc-text">读写Buffer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">2.1.3.</span> <span class="toc-text">小结</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Protocol-Buffers"><span class="toc-number">2.2.</span> <span class="toc-text">Protocol Buffers</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%90%AD%E5%BB%BA%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8%E7%9A%84RPC%E9%80%9A%E9%81%93"><span class="toc-number">3.</span> <span class="toc-text">搭建多路复用的RPC通道</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E5%8D%8A%E5%8F%8C%E5%B7%A5%E9%80%9A%E4%BF%A1"><span class="toc-number">3.1.</span> <span class="toc-text">实现半双工通信</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-number">3.1.1.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E7%A0%81"><span class="toc-number">3.1.2.</span> <span class="toc-text">编码</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E5%85%A8%E5%8F%8C%E5%B7%A5%E9%80%9A%E4%BF%A1"><span class="toc-number">3.2.</span> <span class="toc-text">实现全双工通信</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%90%86-1"><span class="toc-number">3.2.1.</span> <span class="toc-text">原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%96%E7%A0%81-1"><span class="toc-number">3.2.2.</span> <span class="toc-text">编码</span></a></li></ol></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Server/认识RPC" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      认识RPC
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/posts/91c0fa71.html" class="article-date">
+	  <time datetime="2020-10-23T16:00:00.000Z" itemprop="datePublished">2020-10-24</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Server/">Server</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Nodejs/" rel="tag">Nodejs</a>, <a class="article-tag-link-link" href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag">网络</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/posts/91c0fa71.html#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="RPC初识"><a href="#RPC初识" class="headerlink" title="RPC初识"></a>RPC初识</h2><p><code>RPC（Remote Procedure Call）</code>即<strong>远程过程调用</strong>。与<code>Ajax</code>类似。主要用于不同端之间的通信。</p>
+<p>和<code>Ajax</code>的异同之处：</p>
+<ol>
+<li>都是计算机之间网络通信的方式<ol>
+<li><code>Ajax</code>是浏览器与服务端之间的通信方式</li>
+<li><code>RPC</code>是服务端之间的通信方式</li>
+</ol>
+</li>
+<li>都需要双方约定一个数据格式<ol>
+<li><code>Ajax</code>约定格式为<code>json</code></li>
+<li><code>RPC</code>通常使用<strong>二进制</strong></li>
+</ol>
+</li>
+<li>寻址方式<ol>
+<li><code>Ajax</code>使用<code>DNS</code>进行寻址</li>
+<li><code>RPC</code>也需要寻址，可能根据ID或者一个<code>VIP(虚拟IP)</code>。使用<code>DNS</code>成本太高。</li>
+</ol>
+</li>
+<li>应用层协议<ol>
+<li><code>Ajax</code>使用<code>HTTP</code>作为应用层协议</li>
+<li><code>RPC</code>通常使用二进制协议（基于TCP或UDP），传输二进制数据，这样体积小，编解码速度快（计算机本身就只能识别二进制）。</li>
+</ol>
+</li>
+</ol>
+<h2 id="二进制编解码"><a href="#二进制编解码" class="headerlink" title="二进制编解码"></a>二进制编解码</h2><p><code>RPC</code>通信传输的数据是<strong>二进制数据</strong>，而不是<code>JSON</code>数据。</p>
+<p>在<code>Nodejs</code>中，内置了<code>Buffer</code>模块，它可以用来操作二进制数据</p>
+<h3 id="Buffer"><a href="#Buffer" class="headerlink" title="Buffer"></a>Buffer</h3><h4 id="创建Buffer"><a href="#创建Buffer" class="headerlink" title="创建Buffer"></a>创建Buffer</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 使用Buffer.from</span></span><br><span class="line"><span class="comment">// 创建一个8字节 buffer二进制数据</span></span><br><span class="line"><span class="comment">// 每个字符占 1个字节</span></span><br><span class="line"><span class="keyword">const</span> buffer1 = <span class="title class_">Buffer</span>.<span class="title function_">from</span>(<span class="string">&#x27;helloRPC&#x27;</span>); </span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. Buffer.from 的参数可以为数组</span></span><br><span class="line"><span class="comment">// 每个数组元素 占1个字节</span></span><br><span class="line"><span class="keyword">const</span> buffer2 = <span class="title class_">Buffer</span>.<span class="title function_">from</span>([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3. 使用Buffer.alloc</span></span><br><span class="line"><span class="comment">// 创建一个20 字节的Buffer</span></span><br><span class="line"><span class="keyword">const</span> buffer3 = <span class="title class_">Buffer</span>.<span class="title function_">alloc</span>(<span class="number">20</span>);</span><br></pre></td></tr></table></figure>
+
+<h4 id="读写Buffer"><a href="#读写Buffer" class="headerlink" title="读写Buffer"></a>读写Buffer</h4><p><code>Buffer</code>内提供了众多读写<code>Buffer</code>方法，详情见<a target="_blank" rel="noopener" href="https://nodejs.org/api/buffer.html">nodejs文档-Buffer</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1. 读</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 从offset开始，读一个带符号8位的整型</span></span><br><span class="line">buffer.<span class="title function_">readInt8</span>(<span class="number">0</span>) <span class="comment">// 参数为offset，默认为0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 从offset开始，读一个32位的float</span></span><br><span class="line"><span class="comment">// BE代表大端模式，LE代表小端模式</span></span><br><span class="line">buffer.<span class="title function_">readFloatBE</span>(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. 写</span></span><br><span class="line"><span class="comment">// 第一个参数是需要写入的值</span></span><br><span class="line"><span class="comment">// 第二个参数是 offset</span></span><br><span class="line">buffer2.<span class="title function_">writeInt8</span>(<span class="number">12</span>, <span class="number">1</span>)</span><br><span class="line">buffer3.<span class="title function_">writeInt16BE</span>(<span class="number">255</span>, <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>大端模式（big-endian, BE）和小端模式（little-endian, LE）</p>
+<p>两者主要指存放字节的顺序不同，BE将高位放在低地址，LE将高位放在高地址</p>
+<p>16位二进制: 0000 0010 1110 1100</p>
+<p>使用 writeInt16BE(128, 0), 在偏移量位0的位置写入128(2进制是 1000 0000)。写入后</p>
+<p>16位二进制：<strong>1000 0000</strong> 1110 1100（加黑为写入的）</p>
+<p>如果使用writeInt16LE(128, 0)，在偏移量0的位置写入128(2进制是 1000 0000)。写入后</p>
+<p>16位二进制：<strong>0000 1000</strong> 1110 1100（加黑为写入的）</p>
+<p>可见两者写入顺序不同</p>
+</blockquote>
+<h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>在进行<code>RPC</code>通信时，需要创建Buffer对象，然后读写数据。</p>
+<p>可是这种方式太复杂，远没有<code>json</code>方便。后者只需要通过<code>JSON.stringify</code>和<code>JSON.parse</code>进行序列化和反序列化即可。</p>
+<p><code>Google</code>提供了一个<a target="_blank" rel="noopener" href="https://github.com/protocolbuffers/protobuf">protocol buffers</a>二进制编解码库，可以和使用<code>json</code>一样方便</p>
+<h3 id="Protocol-Buffers"><a href="#Protocol-Buffers" class="headerlink" title="Protocol Buffers"></a>Protocol Buffers</h3><p><a target="_blank" rel="noopener" href="https://github.com/protocolbuffers/protobuf">Protocol Buffers</a>是一个二进制编码库。本身提供了众多语言的实现，官方文档也介绍其是一个语言无关的库</p>
+<p>所以可以在nodjs上使用它编码数据，在其它环境下（比如JAVA、Python）来使用它解码数据。</p>
+<p>先安装<code>npm install protocol-buffers</code></p>
+<p>第一步需要编写<code>proto</code>文件，例如<code>test.proto</code>来约束二进制文件的格式。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">message Column &#123;</span><br><span class="line">	required int32 id = 1;</span><br><span class="line">	required string name = 2;</span><br><span class="line">	required float price = 3</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后就可以导入使用</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> protobuf =  <span class="built_in">require</span>(<span class="string">&#x27;protocol-buffers&#x27;</span>);</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建schema</span></span><br><span class="line"><span class="keyword">const</span> schema = <span class="title function_">protobuf</span>(fs.<span class="title function_">redFileSync</span>(__dirname + <span class="string">&#x27;/test.proto&#x27;</span>, <span class="string">&#x27;utf-8&#x27;</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 编码</span></span><br><span class="line"><span class="keyword">const</span> buf = schema.<span class="property">Column</span>.<span class="title function_">encode</span>(&#123;<span class="attr">id</span>:<span class="number">1</span>, <span class="attr">name</span>: <span class="string">&#x27;ff&#x27;</span>, <span class="attr">price</span>: <span class="number">99.9</span>&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 解码</span></span><br><span class="line"><span class="keyword">const</span> data = schema.<span class="property">Column</span>.<span class="title function_">decode</span>(buf)</span><br></pre></td></tr></table></figure>
+
+<h2 id="搭建多路复用的RPC通道"><a href="#搭建多路复用的RPC通道" class="headerlink" title="搭建多路复用的RPC通道"></a>搭建多路复用的RPC通道</h2><h3 id="实现半双工通信"><a href="#实现半双工通信" class="headerlink" title="实现半双工通信"></a>实现半双工通信</h3><h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p>通过使用<code>ndoejs</code>内置的<code>net</code>模块来搭建通信的双端。</p>
+<p><code>nodejs</code>内置的<code>http</code>模块也是基于<code>net</code>模块的。只是<code>http</code>模块用的是<code>http</code>协议。<code>rpc</code>并不用<code>http</code>协议。</p>
+<p>半双工通信即同一时间只能有一个方向的数据传输。</p>
+<p><img src="/../../images/%E5%8D%95%E5%8F%8C%E5%B7%A5.png" alt="单双工"></p>
+<h4 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h4><p>数据mock</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// mock.js</span></span><br><span class="line"><span class="keyword">const</span> data = &#123;</span><br><span class="line">  <span class="number">121391</span>: <span class="string">&quot;第一课：北京故事&quot;</span>,</span><br><span class="line">  <span class="number">121392</span>: <span class="string">&quot;第二课：背影-朱自清&quot;</span>,</span><br><span class="line">  <span class="number">121393</span>: <span class="string">&quot;第三课：最后一课&quot;</span>,</span><br><span class="line">  <span class="number">121394</span>: <span class="string">&quot;第四课：春&quot;</span>,</span><br><span class="line">  <span class="number">121395</span>: <span class="string">&quot;第五课：济南的冬天&quot;</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">getDataById</span> = <span class="keyword">function</span> (<span class="params">id</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> data[id];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">mockId</span> = <span class="keyword">function</span> (<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> index = <span class="title class_">Math</span>.<span class="title function_">ceil</span>(<span class="title class_">Math</span>.<span class="title function_">random</span>() * <span class="number">4</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="title class_">Object</span>.<span class="title function_">keys</span>(data)[index];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>服务端</p>
+<p>监听数据，收到数据后，延时1s将结果返回。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// server</span></span><br><span class="line"><span class="keyword">const</span> net = <span class="built_in">require</span>(<span class="string">&quot;net&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; getDataById &#125; = <span class="built_in">require</span>(<span class="string">&quot;./mock.js&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = net.<span class="title function_">createServer</span>(<span class="function">(<span class="params">socket</span>) =&gt;</span> &#123;</span><br><span class="line">  socket.<span class="title function_">on</span>(<span class="string">&quot;data&quot;</span>, <span class="function">(<span class="params">buffer</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 解析buffer，获取id</span></span><br><span class="line">    <span class="keyword">const</span> id = buffer.<span class="title function_">readInt32BE</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1秒后 返回数据</span></span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">const</span> data = <span class="title function_">getDataById</span>(id);</span><br><span class="line">      socket.<span class="title function_">write</span>(<span class="title class_">Buffer</span>.<span class="title function_">from</span>(data));</span><br><span class="line">    &#125;, <span class="number">1000</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">4000</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>客户端</p>
+<p>先发送数据，当收到服务端处理结果后，输出结果并再次发送数据。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// client</span></span><br><span class="line"><span class="keyword">const</span> net = <span class="built_in">require</span>(<span class="string">&quot;net&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; mockId &#125; = <span class="built_in">require</span>(<span class="string">&quot;./mock.js&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> socket = <span class="keyword">new</span> net.<span class="title class_">Socket</span>(&#123;&#125;);</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">connect</span>(&#123;</span><br><span class="line">  <span class="attr">host</span>: <span class="string">&quot;127.0.0.1&quot;</span>,</span><br><span class="line">  <span class="attr">port</span>: <span class="number">4000</span>,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">sendData</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> id = <span class="title function_">mockId</span>();</span><br><span class="line">  <span class="keyword">const</span> buffer = <span class="title class_">Buffer</span>.<span class="title function_">alloc</span>(<span class="number">4</span>);</span><br><span class="line">  buffer.<span class="title function_">writeInt32BE</span>(id);</span><br><span class="line">  socket.<span class="title function_">write</span>(buffer);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&quot;data&quot;</span>, <span class="function">(<span class="params">buffer</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(buffer.<span class="title function_">toString</span>());</span><br><span class="line">  <span class="title function_">sendData</span>();</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="title function_">sendData</span>();</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="实现全双工通信"><a href="#实现全双工通信" class="headerlink" title="实现全双工通信"></a>实现全双工通信</h3><h4 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h4><p>全双工通信即同一时刻，通信链路上可以有多个方向的数据传输。相比单双工通信会带来两个问题。</p>
+<p><img src="/../../images/%E5%85%A8%E5%8F%8C%E5%B7%A5.png" alt="全双工"></p>
+<p>问题一：客户端同一时间发送两个数据包。服务端接收到的顺序与发送顺序不一致。因此服务端不知道数据包对应是哪次发送的。</p>
+<p>解决：数据包增加一个<strong>首部</strong>，首部存放一个<strong>标识ID</strong>。从而识别数据包。</p>
+<p>问题二：当客户端连续发送n的数据包，TCP底层会进行优化，将这些（二进制）数据包合并成一个，导致服务端以为只收到一个数据包。</p>
+<p>解决：在数据包首部，再增加一个<strong>body长度标识</strong>，指明这个二进制数据的长度。收到数据后进行按照<strong>长度标识</strong>拆包。</p>
+<p>由此，新的数据包结构如下：</p>
+<p><img src="/../../images/%E5%85%A8%E5%8F%8C%E5%B7%A5%E6%95%B0%E6%8D%AE%E6%8A%A5%E6%96%87.png" alt="全双工数据报文"></p>
+<h4 id="编码-1"><a href="#编码-1" class="headerlink" title="编码"></a>编码</h4><p><code>mock.js</code>内容不变</p>
+<p>增加<code>handler.js</code>用于处理接受的数据和发送数据</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = <span class="keyword">function</span> (<span class="params">socket</span>) &#123;</span><br><span class="line">  <span class="keyword">let</span> oldBuffer = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">let</span> sequence = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">handleBuffer</span>(<span class="params">buffer</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> dataArray = [];</span><br><span class="line">    <span class="keyword">if</span> (oldBuffer) buffer = <span class="title class_">Buffer</span>.<span class="title function_">concat</span>([oldBuffer, buffer]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> completeLength = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> ((completeLength = <span class="title function_">checkComplete</span>(buffer))) &#123;</span><br><span class="line">      <span class="comment">// package为一个数据包</span></span><br><span class="line">      <span class="keyword">const</span> package = buffer.<span class="title function_">slice</span>(<span class="number">0</span>, completeLength);</span><br><span class="line">      <span class="comment">// 处理剩余的数据包</span></span><br><span class="line">      buffer = buffer.<span class="title function_">slice</span>(completeLength);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> header = package.<span class="title function_">slice</span>(<span class="number">0</span>, <span class="number">6</span>);</span><br><span class="line">      <span class="keyword">const</span> body = package.<span class="title function_">slice</span>(<span class="number">6</span>);</span><br><span class="line">      <span class="keyword">const</span> parsedData = &#123;</span><br><span class="line">        <span class="attr">sequence</span>: header.<span class="title function_">readInt16BE</span>(),</span><br><span class="line">        <span class="attr">data</span>: body.<span class="title function_">toString</span>(),</span><br><span class="line">      &#125;;</span><br><span class="line">      dataArray.<span class="title function_">push</span>(parsedData);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    oldBuffer = buffer;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> dataArray;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查buffer完整性</span></span><br><span class="line">    <span class="comment">// 根据首部的范围标识来判断</span></span><br><span class="line">    <span class="keyword">function</span> <span class="title function_">checkComplete</span>(<span class="params">buffer</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (buffer.<span class="property">length</span> &lt; <span class="number">6</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">const</span> bodyLength = buffer.<span class="title function_">readInt32BE</span>(<span class="number">2</span>);</span><br><span class="line">      <span class="keyword">const</span> packageLength = <span class="number">6</span> + bodyLength;</span><br><span class="line">      <span class="keyword">return</span> buffer.<span class="property">length</span> &lt; packageLength ? <span class="number">0</span> : packageLength;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">function</span> <span class="title function_">sendBuffer</span>(<span class="params">data, seq</span>) &#123;</span><br><span class="line">    <span class="comment">// 写入body</span></span><br><span class="line">    <span class="keyword">const</span> body = <span class="title class_">Buffer</span>.<span class="title function_">from</span>(data);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 写入首部</span></span><br><span class="line">    <span class="keyword">const</span> header = <span class="title class_">Buffer</span>.<span class="title function_">alloc</span>(<span class="number">6</span>);</span><br><span class="line">    header.<span class="title function_">writeInt16BE</span>(seq || sequence++);</span><br><span class="line">    header.<span class="title function_">writeInt32BE</span>(body.<span class="property">length</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 拼接header和body</span></span><br><span class="line">    <span class="keyword">const</span> buffer = <span class="title class_">Buffer</span>.<span class="title function_">concat</span>([header, body]);</span><br><span class="line"></span><br><span class="line">    socket.<span class="title function_">write</span>(buffer);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    handleBuffer,</span><br><span class="line">    sendBuffer,</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>服务端<code>server.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// server</span></span><br><span class="line"><span class="keyword">const</span> net = <span class="built_in">require</span>(<span class="string">&quot;net&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; getDataById &#125; = <span class="built_in">require</span>(<span class="string">&quot;./mock.js&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> createHandler = <span class="built_in">require</span>(<span class="string">&quot;./handler.js&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> server = net.<span class="title function_">createServer</span>(<span class="function">(<span class="params">socket</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> handler = <span class="title function_">createHandler</span>(socket);</span><br><span class="line">  socket.<span class="title function_">on</span>(<span class="string">&quot;data&quot;</span>, <span class="function">(<span class="params">buffer</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 解析buffer，获取id</span></span><br><span class="line">    <span class="keyword">const</span> dataArray = handler.<span class="title function_">handleBuffer</span>(buffer);</span><br><span class="line">    dataArray.<span class="title function_">forEach</span>(<span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(</span><br><span class="line">        <span class="string">`服务端收到数据：\n\tsequence:<span class="subst">$&#123;data.sequence&#125;</span>\n\tdata:<span class="subst">$&#123;data.data&#125;</span>`</span></span><br><span class="line">      );</span><br><span class="line">      <span class="comment">// 1秒后 返回数据</span></span><br><span class="line">      <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">const</span> responseData = <span class="title function_">getDataById</span>(data.<span class="property">data</span>);</span><br><span class="line">        handler.<span class="title function_">sendBuffer</span>(responseData);</span><br><span class="line">      &#125;, <span class="number">1000</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">server.<span class="title function_">listen</span>(<span class="number">4000</span>);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>客户端<code>client.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// client</span></span><br><span class="line"><span class="keyword">const</span> net = <span class="built_in">require</span>(<span class="string">&quot;net&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> &#123; mockId &#125; = <span class="built_in">require</span>(<span class="string">&quot;./mock.js&quot;</span>);</span><br><span class="line"><span class="keyword">const</span> createHandler = <span class="built_in">require</span>(<span class="string">&quot;./handler.js&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> socket = <span class="keyword">new</span> net.<span class="title class_">Socket</span>(&#123;&#125;);</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">connect</span>(&#123;</span><br><span class="line">  <span class="attr">host</span>: <span class="string">&quot;127.0.0.1&quot;</span>,</span><br><span class="line">  <span class="attr">port</span>: <span class="number">4000</span>,</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> handler = <span class="title function_">createHandler</span>(socket);</span><br><span class="line"></span><br><span class="line">socket.<span class="title function_">on</span>(<span class="string">&quot;data&quot;</span>, <span class="function">(<span class="params">buffer</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> dataArray = handler.<span class="title function_">handleBuffer</span>(buffer);</span><br><span class="line"></span><br><span class="line">  dataArray.<span class="title function_">forEach</span>(<span class="function">(<span class="params">data</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(</span><br><span class="line">      <span class="string">`客户端收到数据：\n\tsequence:<span class="subst">$&#123;data.sequence&#125;</span>\n\tdata:<span class="subst">$&#123;data.data&#125;</span>`</span></span><br><span class="line">    );</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 连续发送10个数据包</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">  <span class="keyword">const</span> id = <span class="title function_">mockId</span>();</span><br><span class="line">  handler.<span class="title function_">sendBuffer</span>(id);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>例子过于简单，所以直接使用<code>Buffer</code></p>
+<p>实际使用推荐通过<code>protocol buffers</code>处理二进制数据</p>
+</blockquote>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://zxffan.github.io/posts/91c0fa71.html" title="认识RPC" target="_blank" rel="external">https://zxffan.github.io/posts/91c0fa71.html</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/fzxen" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpeg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/fzxen" target="_blank"><span class="text-dark">fzxen</span><small class="ml-1x">Web Developer &amp; Designer</small></a></h3>
+        <div>web developer</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/posts/6e1418c.html" title="CSS Review"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/posts/d5def5e2.html" title="数组去重"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/fzxen" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://www.zhihu.com/people/zxffan" target="_blank" title="Zhihu" data-toggle=tooltip data-placement=top><i class="icon icon-zhihu"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
